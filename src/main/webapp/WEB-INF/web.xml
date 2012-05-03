@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+  version="2.5"
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <listener>
+    <listener-class>org.crsh.web.LifeCycle</listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>WelcomeServlet</servlet-name>
+    <servlet-class>org.crsh.web.WelcomeServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WelcomeServlet</servlet-name>
+    <url-pattern>/welcome</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CompleteServlet</servlet-name>
+    <servlet-class>org.crsh.web.CompleteServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CompleteServlet</servlet-name>
+    <url-pattern>/complete</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ExecuteServlet</servlet-name>
+    <servlet-class>org.crsh.web.ExecuteServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ExecuteServlet</servlet-name>
+    <url-pattern>/execute</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CancelServlet</servlet-name>
+    <servlet-class>org.crsh.web.CancelServlet</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CancelServlet</servlet-name>
+    <url-pattern>/cancel</url-pattern>
+  </servlet-mapping>
+</web-app>

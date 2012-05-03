@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title></title>
+  <link href="console.css" rel="stylesheet" type="text/css"/>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"></script>
+  <script type="text/javascript" src="jquery.console.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      // Get welcome message
+      $.ajax({
+        url: "welcome",
+        async: false,
+        dataType: "text",
+        success : function(data) {
+          var controller = $("#console").console({
+            promptLabel: "% ",
+            autofocus: true,
+            welcomeMessage : data,
+            commandHandle: function(line, report) {
+              $.ajax({
+                url: "execute",
+                dataType: "text",
+                data: $.param({line: line}),
+                success: function(data) {
+                  report(data)
+                },
+                error: function(data) {
+                  report("an unexpected error occured")
+                }
+              });
+            },
+            cancelHandle: function() {
+              $.ajax({
+                url: "cancel"
+              });
+            },
+            completeHandle: function(prefix) {
+              var ret = {};
+              $.ajax({
+                url: "complete",
+                dataType: "json",
+                async: false,
+                data: $.param({prefix: prefix}),
+                success: function(data) {
+                  ret = data;
+                }
+              });
+              return ret;
+            }
+          });
+        }
+      });
+    })
+  </script>
+
+</head>
+<body>
+
+<div id="console" class="console">
+
+</div>
+
+</body>
+</html>
