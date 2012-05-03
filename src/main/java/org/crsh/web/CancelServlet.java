@@ -15,9 +15,9 @@ public class CancelServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     HttpSession session = req.getSession();
-    CommandExecution execution = ((SerializableTransient<CommandExecution>)session.getAttribute("execution")).object;
+    SerializableTransient<CommandExecution> execution = ((SerializableTransient<CommandExecution>)session.getAttribute("execution"));
     if (execution != null) {
-      execution.cancel();
+      execution.object.cancel();
     }
   }
 }
