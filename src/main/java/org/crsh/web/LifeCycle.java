@@ -41,6 +41,7 @@ public class LifeCycle implements HttpSessionListener, ServletContextListener {
       bootstrap.bootstrap();
       crash = new CRaSH(bootstrap.getContext());
       sce.getServletContext().setAttribute("crash", crash);
+      this.bootstrap = bootstrap;
     }
     catch (Exception e) {
       throw new UndeclaredThrowableException(e);
@@ -49,8 +50,11 @@ public class LifeCycle implements HttpSessionListener, ServletContextListener {
   }
 
   public void contextDestroyed(ServletContextEvent sce) {
-    sce.getServletContext().setAttribute("crash", null);
-    crash = null;
-    bootstrap.shutdown();
+    if (bootstrap != null) {
+      sce.getServletContext().setAttribute("crash", null);
+      crash = null;
+      bootstrap.shutdown();
+      bootstrap = null;
+    }
   }
 }
