@@ -242,12 +242,16 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Handle setting focus
-        container.click(function(){
-            inner.addClass('jquery-console-focus');
-            inner.removeClass('jquery-console-nofocus');
-            typer.focus();
-            scrollToBottom();
-            return false;
+        container.click(function(event){
+            if ("A" == event.target.tagName) {
+              return true;
+            } else {
+              inner.addClass('jquery-console-focus');
+              inner.removeClass('jquery-console-nofocus');
+              typer.focus();
+              scrollToBottom();
+              return false;
+            }
         });
 
         ////////////////////////////////////////////////////////////////////////
@@ -701,8 +705,21 @@
     };
     // Simple utility for printing messages
     $.fn.filledText = function(txt){
-        $(this).text(txt);
-        $(this).html($(this).html().replace(/\n/g,'<br/>').replace(/ /g,'&nbsp;'));
-        return this;
+
+      function replLinks(text) {
+        var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        return text.replace(exp,"<a href='$1' target='_blank'>$1</a>");
+      }
+
+      $(this).text(txt);
+      var html = $(this).html();
+      // Line breaks
+      html = html.replace(/\n/g,'<br/>');
+      // Whitespace
+      html = html.replace(/ /g,'&nbsp;');
+      // HTML links
+      html = replLinks(html);
+      $(this).html(html);
+      return this;
     };
 })(jQuery);
