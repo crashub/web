@@ -3,7 +3,10 @@
 <html>
 <head>
   <title></title>
-  <link href="console.css" rel="stylesheet" type="text/css"/>
+
+  <link rel="stylesheet/less" type="text/css" href="console.less"/>
+
+  <script type="text/javascript" src="less-1.3.0.min.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"></script>
   <script type="text/javascript" src="jquery.console.js"></script>
 
@@ -60,9 +63,26 @@
 </head>
 <body>
 
-<div id="console" class="console">
-
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <ul id="tabs" class="nav">
+        <li><a href="http://vietj.github.com/crash/#home">Home</a></li>
+        <li><a href="http://vietj.github.com/crash/#doc">Documentation</a></li>
+        <li><a href="http://vietj.github.com/crash/javadoc/index.html" target="_blank">Javadoc</a></li>
+        <li><a href="http://crash.vietj.cloudbees.net/">Demo</a></li>
+      </ul>
+    </div>
+  </div>
 </div>
+
+<div class="container">
+  <div class="center">
+    <div id="console" class="console">
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>

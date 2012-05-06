@@ -1,25 +1,33 @@
+/*@import "cyborg-2.0.2.min.css";*/
+@import "bootstrap/bootstrap.less";
+@import "themes/cyborg/bootswatch.less";
+
+body {
+  padding-top: 64px;
+}
+
 div.console {
   font-size: 14px;
-  margin-top:1em
+  margin-top:1em;
+  background-color: @heroUnitBackground;
+  .border-radius(6px);
 }
 div.console div.jquery-console-inner {
-  width:900px;
   height:600px;
-  background:#efefef;
   padding:0.5em;
-  overflow:auto
+  overflow:auto;
 }
 div.console div.jquery-console-prompt-box {
-  color:#444;
+  color:@headingsColor;
   font-family:monospace;
 }
 div.console div.jquery-console-focus span.jquery-console-cursor {
-  background:#333;
-  color:#eee;
-  font-weight:bold
+  background:@headingsColor;
+  color:@bodyBackground;
+  font-weight:bold;
 }
 div.console div.jquery-console-message-error {
-  color:#ef0505;
+  color:@textColor;
   font-family:sans-serif;
   font-weight:bold;
   padding:0.1em;
@@ -29,8 +37,8 @@ div.console div.jquery-console-message {
   padding:0.1em;
 }
 div.console div.jquery-console-message-success {
-  color:#187718;
+  /*color:#187718;*/
 }
 div.console span.jquery-console-prompt-label {
-  font-weight:bold
+  font-weight:bold;
 }
