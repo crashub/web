@@ -25,7 +25,7 @@
           var controller = $("#console").console({
             promptLabel: "% ",
             autofocus: true,
-            welcomeMessage : data,
+            welcomeMessage : data + "\n\nType 'help' to show the available commands",
             commandHandle: function(line, report) {
               $.ajax({
                 url: "execute",
@@ -80,6 +80,7 @@
 </div>
 
 <div class="container">
+
   <div class="center">
     <div id="console" class="console">
     </div>
