@@ -233,6 +233,28 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <version>1.3.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+              <configuration>
+                <sourceDirectory>${project.basedir}/src/main/webapp/less</sourceDirectory>
+                <outputDirectory>${project.build.directory}/${project.build.finalName}/css</outputDirectory>
+                <compress>true</compress>
+                <includes>
+                  <include>console.less</include>
+                </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
 	</build>
 
 </project>
