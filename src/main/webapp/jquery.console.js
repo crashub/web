@@ -466,7 +466,7 @@
                 if (continuedText) text = continuedText;
                 var ret = config.commandHandle(text,function(msgs){
                     commandResult(msgs);
-                });
+                },cols);
                 if (extern.continuedPrompt && !continuedText)
                   continuedText = promptText;
                 if (typeof ret == 'boolean') {

@@ -21,6 +21,9 @@ import java.util.Map;
 @WebServlet(urlPatterns = "/complete")
 public class CompleteServlet extends HttpServlet {
 
+  /** . */
+  static final Gson gson = new Gson();
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
@@ -56,6 +59,6 @@ public class CompleteServlet extends HttpServlet {
         }
       }
     }
-    resp.getWriter().write(new Gson().toJson(values));
+    resp.getWriter().write(gson.toJson(values));
   }
 }

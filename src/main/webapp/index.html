@@ -10,11 +10,16 @@
     <script type="text/javascript" src="less-1.3.0.min.js"></script>
   -->
 
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.js"></script>
+  <script type="text/javascript" src="jquery-1.7.js"></script>
   <script type="text/javascript" src="jquery.console.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function() {
+
+      var replLinks = function(text) {
+        var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        return text.replace(exp,"<a href='$1' target='_blank'>$1</a>");
+      };
 
       // Get welcome message
       $.ajax({
@@ -26,13 +31,32 @@
             promptLabel: "% ",
             autofocus: true,
             welcomeMessage : data + "\n\nType 'help' to show the available commands",
-            commandHandle: function(line, report) {
+            commandHandle: function(line, report, width) {
               $.ajax({
                 url: "execute",
-                dataType: "text",
-                data: $.param({line: line}),
+                dataType: "json",
+                data: $.param({line: line, width: width}),
                 success: function(data) {
-                  report(data)
+                  var container = $("<div class='jquery-console-message' style='display: inline'></div>");
+                  $.each(data, function(index, value) {
+                    var chunk = $("<span></span>").text(value.text);
+                    if (value.fg) {
+                      chunk.css('color', value.fg);
+                    }
+                    if (value.bg) {
+                      chunk.css('background-color', value.bg);
+                    }
+                    var html = chunk.html();
+                    // Line breaks
+                    html = html.replace(/\n/g,'<br/>');
+                    // Whitespace
+                    html = html.replace(/ /g,'&nbsp;');
+                    // HTML links
+                    html = replLinks(html);
+                    chunk.html(html);
+                    container.append(chunk);
+                  });
+                  report(container)
                 },
                 error: function(data) {
                   report("an unexpected error occured")

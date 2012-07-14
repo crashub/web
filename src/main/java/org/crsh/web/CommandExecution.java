@@ -19,8 +19,12 @@ class CommandExecution implements ShellProcessContext {
   /** . */
   final AtomicReference<ShellResponse> shellResponse = new AtomicReference<ShellResponse>();
 
-  CommandExecution(ShellProcess process) {
+  /** . */
+  final int width;
+
+  CommandExecution(ShellProcess process, int width) {
     this.process = process;
+    this.width = width;
   }
 
   ShellResponse execute() {
@@ -36,7 +40,7 @@ class CommandExecution implements ShellProcessContext {
   }
 
   public int getWidth() {
-    return 40; // ???
+    return width;
   }
   public String getProperty(String name) {
     return null;

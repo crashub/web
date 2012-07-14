@@ -97,7 +97,7 @@
     <dependency>
       <groupId>org.crsh</groupId>
       <artifactId>crsh.shell.core</artifactId>
-      <version>1.1.0-beta1</version>
+      <version>1.1.0-cr1</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
