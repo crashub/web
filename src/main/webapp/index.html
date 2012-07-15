@@ -37,11 +37,19 @@
       var target = document.getElementById('console');
       var spinner = new Spinner(opts).spin(target);
 
-      // Integrate spinner with jquery
-      $(document).ajaxStart(function() {
+      // Integrate spinner
+      var cancel;
+      window.showSpinner = function() {
         spinner.spin(target)
+      };
+      $(document).ajaxStart(function() {
+        t = setTimeout("showSpinner()", 100)
       });
       $(document).ajaxStop(function() {
+        var tmp = t;
+        if (tmp) {
+          clearTimeout(tmp);
+        }
         spinner.stop();
       });
 
