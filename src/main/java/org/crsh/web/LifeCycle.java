@@ -32,6 +32,11 @@ public class LifeCycle implements HttpSessionListener, ServletContextListener {
   }
 
   public void sessionDestroyed(HttpSessionEvent se) {
+    HttpSession session = se.getSession();
+    SerializableTransient<CRaSHSession> ref = (SerializableTransient<CRaSHSession>)session.getAttribute("crash");
+    if (ref != null && ref.object != null) {
+      ref.object.close();
+    }
   }
 
   public void contextInitialized(ServletContextEvent sce) {
