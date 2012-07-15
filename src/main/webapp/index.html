@@ -16,9 +16,24 @@
   <script type="text/javascript">
     $(document).ready(function() {
 
+      // Utility function
       var replLinks = function(text) {
         var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
         return text.replace(exp,"<a href='$1' target='_blank'>$1</a>");
+      };
+
+      // Override console filledText to handle our own stuff
+      $.fn.filledText = function(txt) {
+        $(this).text(txt);
+        var html = $(this).html();
+        // Line breaks
+        html = html.replace(/\n/g,'<br/>');
+        // Whitespace
+        html = html.replace(/ /g,'&nbsp;');
+        // HTML links
+        html = replLinks(html);
+        $(this).html(html);
+        return this;
       };
 
       // Get welcome message
@@ -31,29 +46,22 @@
             promptLabel: "% ",
             autofocus: true,
             welcomeMessage : data + "\n\nType 'help' to show the available commands",
-            commandHandle: function(line, report, width) {
+            cols: 80,
+            commandHandle: function(line, report) {
               $.ajax({
                 url: "execute",
                 dataType: "json",
-                data: $.param({line: line, width: width}),
+                data: $.param({line: line, width: 80}),
                 success: function(data) {
                   var container = $("<div class='jquery-console-message' style='display: inline'></div>");
                   $.each(data, function(index, value) {
-                    var chunk = $("<span></span>").text(value.text);
+                    var chunk = $("<span></span>").filledText(value.text);
                     if (value.fg) {
                       chunk.css('color', value.fg);
                     }
                     if (value.bg) {
                       chunk.css('background-color', value.bg);
                     }
-                    var html = chunk.html();
-                    // Line breaks
-                    html = html.replace(/\n/g,'<br/>');
-                    // Whitespace
-                    html = html.replace(/ /g,'&nbsp;');
-                    // HTML links
-                    html = replLinks(html);
-                    chunk.html(html);
                     container.append(chunk);
                   });
                   report(container)

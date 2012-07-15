@@ -63,8 +63,8 @@
 	    13: commandTrigger,
 	    // tab
 	    18: doNothing,
-	    // tab ?
-	    9: doComplete
+        // tab
+        9: doComplete
 	};
 	var ctrlCodes = {
 	    // C-a
@@ -126,28 +126,6 @@
 	var acceptInput = true;
 	// When this value is true, the command has been canceled
 	var cancelCommand = false;
-
-      // The number of chars that can fit in the console horizontally
-      var cols = 0;
-      var _a = $("<div class='console'></div>");
-      var _b = $("<div class='jquery-console-inner'></div>");
-      var _c = $("<div class='jquery-console-message' style='position:absolute'></div>");
-      $("body").append(_a);
-      _a.append(_b);
-      _b.append(_c);
-      var consoleWidth = _b.outerWidth();
-      var text = "";
-      while (cols < 1000) {
-        _c.text(text);
-        var width = _c.outerWidth();
-        if (width >= consoleWidth) {
-          break;
-        } else {
-          text += "I";
-          cols++;
-        }
-      }
-      _a.remove();
 
         // External exports object
         var extern = {};
@@ -242,16 +220,12 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Handle setting focus
-        container.click(function(event){
-            if ("A" == event.target.tagName) {
-              return true;
-            } else {
-              inner.addClass('jquery-console-focus');
-              inner.removeClass('jquery-console-nofocus');
-              typer.focus();
-              scrollToBottom();
-              return false;
-            }
+        container.click(function(){
+            inner.addClass('jquery-console-focus');
+            inner.removeClass('jquery-console-nofocus');
+            typer.focus();
+            scrollToBottom();
+            return false;
         });
 
         ////////////////////////////////////////////////////////////////////////
@@ -466,7 +440,7 @@
                 if (continuedText) text = continuedText;
                 var ret = config.commandHandle(text,function(msgs){
                     commandResult(msgs);
-                },cols);
+                });
                 if (extern.continuedPrompt && !continuedText)
                   continuedText = promptText;
                 if (typeof ret == 'boolean') {
@@ -611,40 +585,39 @@
 	    return false;
 	};
 
-  function doComplete() {
-    if(typeof config.completeHandle == 'function') {
-      var completions = config.completeHandle(promptText);
-      var len = completions.length;
-      if (len == 1) {
-        extern.promptText(promptText + completions[0]);
-      } else if (len > 1) {
-        var prompt = promptText;
-        // Compute the number of rows that will fit in the width
-        var max = 0;
-        for (var i = 0;i < len;i++) {
-          max = Math.max(max, completions[i].length);
+    function doComplete() {
+        if(typeof config.completeHandle == 'function') {
+            var completions = config.completeHandle(promptText);
+            var len = completions.length;
+            if (len === 1) {
+                extern.promptText(promptText + completions[0]);
+            } else if (len > 1 && config.cols) {
+                var prompt = promptText;
+                // Compute the number of rows that will fit in the width
+                var max = 0;
+                for (var i = 0;i < len;i++) {
+                    max = Math.max(max, completions[i].length);
+                }
+                max += 2;
+                var n = Math.floor(config.cols / max);
+                var buffer = "";
+                var col = 0;
+                for (i = 0;i < len;i++) {
+                    var completion = completions[i];
+                    buffer += completions[i];
+                    for (var j = completion.length;j < max;j++) {
+                        buffer += " ";
+                    }
+                    if (++col >= n) {
+                        buffer += "\n";
+                        col = 0;
+                    }
+                }
+                commandResult(buffer,"jquery-console-message-value");
+                extern.promptText(prompt);
+            }
         }
-        max += 2;
-        var n = Math.floor(cols / max);
-        var buffer = "";
-        var col = 0;
-        for (i = 0;i < len;i++) {
-          var completion = completions[i];
-          buffer += completions[i];
-          for (var j = completion.length;j < max;j++) {
-            buffer += " ";
-          }
-          if (++col >= n) {
-            buffer += "\n";
-            col = 0;
-          }
-        }
-        commandResult(buffer);
-        extern.promptText(prompt);
-        window.foo = typer;
-      }
-    }
-  };
+    };
 
 	function doNothing() {};
 
@@ -705,21 +678,8 @@
     };
     // Simple utility for printing messages
     $.fn.filledText = function(txt){
-
-      function replLinks(text) {
-        var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-        return text.replace(exp,"<a href='$1' target='_blank'>$1</a>");
-      }
-
-      $(this).text(txt);
-      var html = $(this).html();
-      // Line breaks
-      html = html.replace(/\n/g,'<br/>');
-      // Whitespace
-      html = html.replace(/ /g,'&nbsp;');
-      // HTML links
-      html = replLinks(html);
-      $(this).html(html);
-      return this;
+        $(this).text(txt);
+        $(this).html($(this).html().replace(/\n/g,'<br/>'));
+        return this;
     };
 })(jQuery);
