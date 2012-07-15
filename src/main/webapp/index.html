@@ -10,11 +10,40 @@
     <script type="text/javascript" src="less-1.3.0.min.js"></script>
   -->
 
+  <script type="text/javascript" src="spin.min.js"></script>
   <script type="text/javascript" src="jquery-1.7.js"></script>
   <script type="text/javascript" src="jquery.console.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function() {
+
+      // Ajax spinner
+      var opts = {
+        lines: 13, // The number of lines to draw
+        length: 7, // The length of each line
+        width: 4, // The line thickness
+        radius: 10, // The radius of the inner circle
+        rotate: 0, // The rotation offset
+        color: '#33B5E5', // #rgb or #rrggbb
+        speed: 1, // Rounds per second
+        trail: 60, // Afterglow percentage
+        shadow: false, // Whether to render a shadow
+        hwaccel: false, // Whether to use hardware acceleration
+        className: 'spinner', // The CSS class to assign to the spinner
+        zIndex: 2e9, // The z-index (defaults to 2000000000)
+        top: 'auto', // Top position relative to parent in px
+        left: 'auto' // Left position relative to parent in px
+      };
+      var target = document.getElementById('console');
+      var spinner = new Spinner(opts).spin(target);
+
+      // Integrate spinner with jquery
+      $(document).ajaxStart(function() {
+        spinner.spin(target)
+      });
+      $(document).ajaxStop(function() {
+        spinner.stop();
+      });
 
       // Utility function
       var replLinks = function(text) {
@@ -131,7 +160,7 @@
         <li><a href="http://vietj.github.com/crash/#home">Home</a></li>
         <li><a href="http://vietj.github.com/crash/#doc">Documentation</a></li>
         <li><a href="http://vietj.github.com/crash/javadoc/index.html" target="_blank">Javadoc</a></li>
-        <li><a href="http://crash.vietj.cloudbees.net/">Demo</a></li>
+        <li><a href="http://crash2.vietj.cloudbees.net/">Demo</a></li>
       </ul>
     </div>
   </div>
