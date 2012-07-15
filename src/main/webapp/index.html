@@ -36,6 +36,32 @@
         return this;
       };
 
+      //
+      var demo =
+              "\n" +
+              "\n" +
+              "This CRaSH demo will show you a few CRaSH features:\n" +
+
+              "\n" +
+              "Database:\n" +
+              "% jdbc open java:comp/env/jdbc/crash                       open a connection to the database\n" +
+              "% jdbc info                                                display connection info\n" +
+              "% jdbc execute select count(*) from dual where 1=1         execute some SQL\n" +
+              "% jdbc close                                               close the current jdbc connection\n" +
+
+              "\n" +
+              "Threads:\n" +
+              "% thread ls                                                show all threads\n" +
+              "% thread dump X                                            dump thread X\n" +
+
+              "\n" +
+              "System:\n" +
+              "% system propget java.version                              display a sytem property\n" +
+              "% system freemem                                           display amount of free memory\n" +
+
+              "\n" +
+              "Type 'help' to show the available commands\n";
+
       // Get welcome message
       $.ajax({
         url: "welcome",
@@ -45,7 +71,7 @@
           var controller = $("#console").console({
             promptLabel: data.prompt,
             autofocus: true,
-            welcomeMessage : data.welcome + "\n\nType 'help' to show the available commands",
+            welcomeMessage : data.welcome + demo,
             cols: 80,
             commandHandle: function(line, report) {
               $.ajax({
