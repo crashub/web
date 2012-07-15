@@ -40,12 +40,12 @@
       $.ajax({
         url: "welcome",
         async: false,
-        dataType: "text",
+        dataType: "json",
         success : function(data) {
           var controller = $("#console").console({
-            promptLabel: "% ",
+            promptLabel: data.prompt,
             autofocus: true,
-            welcomeMessage : data + "\n\nType 'help' to show the available commands",
+            welcomeMessage : data.welcome + "\n\nType 'help' to show the available commands",
             cols: 80,
             commandHandle: function(line, report) {
               $.ajax({

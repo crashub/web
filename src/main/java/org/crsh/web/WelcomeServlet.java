@@ -1,5 +1,6 @@
 package org.crsh.web;
 
+import com.google.gson.JsonObject;
 import org.crsh.shell.Shell;
 
 import javax.servlet.ServletException;
@@ -17,6 +18,10 @@ public class WelcomeServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
     String welcome = shell.getWelcome();
-    resp.getWriter().print(welcome);
+    String prompt = shell.getPrompt();
+    JsonObject obj = new JsonObject();
+    obj.addProperty("welcome", welcome);
+    obj.addProperty("prompt", prompt);
+    resp.getWriter().write(CompleteServlet.gson.toJson(obj));
   }
 }
