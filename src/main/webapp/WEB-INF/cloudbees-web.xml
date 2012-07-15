@@ -1,5 +1,5 @@
 <cloudbees-web-app>
- <appid>vietj/crash</appid>
+ <appid>vietj/crash2</appid>
 <!--
  <resource name="jdbc/BEES_DB_NAME" auth="Container" type="javax.sql.DataSource">
   <param name="username" value="BEES_DB_USER" />
@@ -7,4 +7,9 @@
   <param name="url" value="jdbc:cloudbees://BEES_DB_NAME" />
  </resource>
 -->
+  <resource name="jdbc/crash" auth="Container" type="javax.sql.DataSource">
+    <param name="username" value="crash" />
+    <param name="password" value="crash" />
+    <param name="url" value="jdbc:cloudbees://crash" />
+  </resource>
 </cloudbees-web-app>
