@@ -64,6 +64,7 @@
         $(this).text(txt);
         var html = $(this).html();
         // Line breaks
+        html = html.replace(/\r/g,'');
         html = html.replace(/\n/g,'<br/>');
         // Whitespace
         html = html.replace(/ /g,'&nbsp;');
