@@ -61,15 +61,26 @@
 
       // Override console filledText to handle our own stuff
       $.fn.filledText = function(txt) {
-        $(this).text(txt);
-        var html = $(this).html();
-        // Line breaks
-        html = html.replace(/\r/g,'');
-        html = html.replace(/\n/g,'<br/>');
-        // Whitespace
+        var buffer = [];
+        for (var i = 0;i < txt.length;i++) {
+          var c = txt.charAt(i);
+          if (c == '\r') {
+            // Ignore
+          } else if (c == '\n') {
+            buffer.push("<br/>");
+          } else if (c == ' ') {
+            buffer.push('&nbsp;')
+          } else if (c == '<') {
+            buffer.push("&lg;")
+          } else if (c == '>') {
+            buffer.push("&gt;")
+          } else {
+            buffer.push(c);
+          }
+        }
+        var html = buffer.join("");
         html = html.replace(/ /g,'&nbsp;');
-        // HTML links
-        html = replLinks(html);
+//        html = replLinks(html);
         $(this).html(html);
         return this;
       };
@@ -110,12 +121,12 @@
             promptLabel: data.prompt,
             autofocus: true,
             welcomeMessage : data.welcome + demo,
-            cols: 80,
+            cols: 110,
             commandHandle: function(line, report) {
               $.ajax({
                 url: "execute",
                 dataType: "json",
-                data: $.param({line: line, width: 80}),
+                data: $.param({line: line, width: 110}),
                 success: function(data) {
                   var container = $("<div class='jquery-console-message' style='display: inline'></div>");
                   $.each(data, function(index, value) {
