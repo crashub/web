@@ -1,9 +1,9 @@
 <cloudbees-web-app>
 
- <!-- deploy with : bees app:deploy -a vietj/crash2 target/crash.war -->
+ <!-- deploy with : bees app:deploy -a vietj/crash target/crash.war -->
  <!-- test with   : bees app:run target/crash.war  -->
 
- <appid>vietj/crash2</appid>
+ <appid>vietj/crash</appid>
 <!--
  <resource name="jdbc/BEES_DB_NAME" auth="Container" type="javax.sql.DataSource">
   <param name="username" value="BEES_DB_USER" />
