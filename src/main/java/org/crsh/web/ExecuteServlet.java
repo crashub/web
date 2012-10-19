@@ -47,8 +47,9 @@ public class ExecuteServlet extends HttpServlet {
     session.setAttribute("execution", new SerializableTransient<CommandExecution>(execution));
     try {
       ShellResponse response = execution.execute();
-      if (response != null) {
-        Style style = Style.reset;
+      if (response != null) 
+      {
+        /*Style style = Style.reset;
         JsonArray array = new JsonArray();
         for (Object o : response.getReader()) {
           if (o instanceof Style) {
@@ -75,7 +76,8 @@ public class ExecuteServlet extends HttpServlet {
             array.add(elt);
           }
         }
-        resp.getWriter().write(CompleteServlet.gson.toJson(array));
+        resp.getWriter().write(CompleteServlet.gson.toJson(array));*/
+      	resp.getWriter().write(CompleteServlet.gson.toJson(execution.getDisplay()));
       }
     }
     finally {
