@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
@@ -128,34 +127,14 @@ class CommandExecution implements ShellProcessContext
 					}
 				}
 				elt.addProperty("text", text.getText().toString());
-
-				//
-				source.data(elt);
-				String data = new Gson().toJson(source);
-				for (String datum : data.split("\r\n|\r|\n")) {
-					writer.print("data: ");
-					writer.print(datum);
-					writer.print("\n");
-				}
-				writer.print('\n');
-				writer.flush();
+				json.add(elt);
 			}
 		} 
 		else if (element instanceof CLS) 
 		{
 			JsonObject elt = new JsonObject();
 			elt.addProperty("text", "cls");
-
-			//
-			source.data(elt);
-			String data = new Gson().toJson(source);
-			for (String datum : data.split("\r\n|\r|\n")) {
-				writer.print("data: ");
-				writer.print(datum);
-				writer.print("\n");
-			}
-			writer.print('\n');
-			writer.flush();
+			json.add(elt);
 		}
 	}
 
@@ -165,6 +144,15 @@ class CommandExecution implements ShellProcessContext
 	@Override
 	public void flush() throws IOException
 	{
+		source.data(json);
+		String data = new Gson().toJson(source);
+		for (String datum : data.split("\r\n|\r|\n")) {
+			writer.print("data: ");
+			writer.print(datum);
+			writer.print("\n");
+		}
+		writer.print('\n');
+		writer.flush();
 	}
 	
 
@@ -174,15 +162,6 @@ class CommandExecution implements ShellProcessContext
 	@Override
 	public int getHeight()
 	{
-		return 30;
+		return 40;
 	}
-
-	/**
-    * @see org.crsh.Pipe#getConsumedType()
-    */
-   @Override
-   public Class<Chunk> getConsumedType()
-   {
-	   return Chunk.class;
-   }
 }

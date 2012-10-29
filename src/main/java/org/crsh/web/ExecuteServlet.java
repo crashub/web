@@ -57,8 +57,12 @@ public class ExecuteServlet extends HttpServlet
 		Event event = new Gson().fromJson(data, Event.class);
 		if("message".equals(event.type))
 		{
-			queue.offer(new Event("message").data(event.data));
+			queue.offer(event);
 			currentSession.set(request.getSession());
+		} 
+		else if("close".equals(event.type))
+		{
+			connections.remove(event.socket);
 		}
 
 		executor.execute(new Runnable()
@@ -103,6 +107,7 @@ public class ExecuteServlet extends HttpServlet
 								}
 								writer.print('\n');
 								writer.flush();
+								context.complete();
 							}
 						}
 						catch (Exception e)
@@ -129,6 +134,7 @@ public class ExecuteServlet extends HttpServlet
 		final String id = request.getParameter("id");
 		String transport = request.getParameter("transport");
 		AsyncContext context = request.startAsync();
+		context.setTimeout(300 * 1000L); // 5 minutes
 
 		response.setCharacterEncoding("utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
