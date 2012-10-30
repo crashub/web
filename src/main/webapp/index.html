@@ -91,18 +91,23 @@
       var demo =
               "\n" +
               "\n" +
-              "This CRaSH demo will show you a few CRaSH features:\n" +
+              "This CRaSH demo provides a few CRaSH features:\n" +
+
+//              "\n" +
+//              "Database:\n" +
+//              "% jdbc open java:comp/env/jdbc/crash                       open a connection to the database\n" +
+//              "% jdbc info                                                display connection info\n" +
+//              "% jdbc execute select count(*) from dual where 1=1         execute some SQL\n" +
+//              "% jdbc close                                               close the current jdbc connection\n" +
 
               "\n" +
-              "Database:\n" +
-              "% jdbc open java:comp/env/jdbc/crash                       open a connection to the database\n" +
-              "% jdbc info                                                display connection info\n" +
-              "% jdbc execute select count(*) from dual where 1=1         execute some SQL\n" +
-              "% jdbc close                                               close the current jdbc connection\n" +
+              "Cool stuff using server push:\n" +
+              "% dashboard                                                show a JVM dashboard\n" +
 
               "\n" +
               "Threads:\n" +
-              "% thread ls                                                show all threads\n" +
+              "% thread top                                               show all threads\n" +
+              "% thread ls                                                list all threads\n" +
               "% thread dump X                                            dump thread X\n" +
 
               "\n" +
