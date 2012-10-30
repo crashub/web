@@ -125,20 +125,22 @@ class ProcessContext implements ShellProcessContext {
   }
 
   public void flush() throws IOException {
-    JsonArray tmp = buffer;
-    buffer = null;
-    ExecuteServlet.Event event = new ExecuteServlet.Event("message");
-    event.data(tmp);
-    event.socket(conn.id);
-    String data = new Gson().toJson(event);
-    System.out.println("Sending data to " + conn.id);
-    PrintWriter writer = conn.context.getResponse().getWriter();
-    for (String datum : data.split("\r\n|\r|\n")) {
-      writer.print("data: ");
-      writer.print(datum);
-      writer.print("\n");
+    if (buffer != null && buffer.size() > 0) {
+      JsonArray tmp = buffer;
+      buffer = null;
+      ExecuteServlet.Event event = new ExecuteServlet.Event("message");
+      event.data(tmp);
+      event.socket(conn.id);
+      String data = new Gson().toJson(event);
+      System.out.println("Sending data to " + conn.id);
+      PrintWriter writer = conn.context.getResponse().getWriter();
+      for (String datum : data.split("\r\n|\r|\n")) {
+        writer.print("data: ");
+        writer.print(datum);
+        writer.print("\n");
+      }
+      writer.print('\n');
+      writer.flush();
     }
-    writer.print('\n');
-    writer.flush();
   }
 }
