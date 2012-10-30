@@ -13,7 +13,7 @@ class Connection implements AsyncListener
 {
 
   /** . */
-  final ProcessServlet servlet;
+  final ExecuteServlet servlet;
 
   /** . */
   final AsyncContext context;
@@ -27,71 +27,61 @@ class Connection implements AsyncListener
   /** . */
   ProcessContext current;
 
-  Connection(ProcessServlet servlet, AsyncContext context, Shell shell, String id) {
+  Connection(ExecuteServlet servlet, AsyncContext context, Shell shell, String id) {
     this.servlet = servlet;
     this.context = context;
     this.id = id;
     this.shell = shell;
   }
 
-  void process(ProcessServlet.Event event) {
+  void process(ExecuteServlet.Event event) {
 
     if("message".equals(event.type)) {
 
       //
       if (current != null) {
-        System.out.println("DUPLICATE PROCESS EXECUTION (WTF?)");
-        return;
-      }
+        System.out.println("Duplicate process execution");
+      } else {
+        // Create a shell session if needed
+        if (shell == null) {
+          // Should use request principal :-)
+        }
 
-      // Create a shell session if needed
-      if (shell == null) {
-        // Should use request principal :-)
-      }
+        //
+        Map<String, Object> map = (Map<String, Object>) event.data;
+        String line = (String)map.get("line");
+        Double widthP = (Double)map.get("width");
+        int width = 80;
+        if (widthP != null)
+        {
+          width = widthP.intValue();
+        }
 
-      //
-      Map<String, Object> map = (Map<String, Object>) event.data;
-      String line = (String)map.get("line");
-      Double widthP = (Double)map.get("width");
-      int width = 80;
-      if (widthP != null)
-      {
-        width = widthP.intValue();
+        // Execute process and we are done
+        current = new ProcessContext(this, line, width);
+        current.begin();
       }
-
-      // Execute process and we are done
-      current = new ProcessContext(this, line, width);
-      current.begin();
+    } else {
+      System.out.println("Unhandled event " + event);
     }
   }
 
-
-
-
-
-
-
-
-
-
-
   public void onStartAsync(AsyncEvent event) throws IOException {
-    System.out.println("STARTING " + id);
-    servlet.connections.put(id, this);
+    // Should not be called
   }
 
   public void onComplete(AsyncEvent event) throws IOException {
-    System.out.println("COMPLETING " + id);
+    System.out.println("onComplete " + id);
     servlet.connections.remove(id);
   }
 
   public void onTimeout(AsyncEvent event) throws IOException {
-    System.out.println("TIMED OUT " + id);
+    System.out.println("onTimeOut " + id);
     servlet.connections.remove(id);
   }
 
   public void onError(AsyncEvent event) throws IOException {
-    System.out.println("ERROR " + id);
+    System.out.println("onError " + id);
     servlet.connections.remove(id);
   }
 }

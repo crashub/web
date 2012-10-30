@@ -48,20 +48,27 @@ class ProcessContext implements ShellProcessContext {
   }
 
   void begin() {
-    System.out.println("BEGINNING " + line);
+    System.out.println("Executing " + line);
     process = conn.shell.createProcess(line);
     process.execute(this);
-    System.out.println("BEGAN " + line);
   }
 
   void cancel() {
-    System.out.println("CANCELLING " + line);
+    System.out.println("Cancelling " + line);
     process.cancel();
   }
 
   public void end(ShellResponse response) {
     conn.current = null;
-    System.out.println("TERMINATED " + line + " with " + response);
+    System.out.println("Terminated " + line + " with " + response);
+    try {
+      conn.context.getResponse().getWriter().close();
+    }
+    catch (IOException ignore) {
+    }
+    finally {
+      conn.context.complete();
+    }
   }
 
   public int getWidth() {
@@ -108,11 +115,11 @@ class ProcessContext implements ShellProcessContext {
   }
 
   public void flush() throws IOException {
-    ProcessServlet.Event event = new ProcessServlet.Event("message");
+    ExecuteServlet.Event event = new ExecuteServlet.Event("message");
     event.data(buffer);
     event.socket(conn.id);
     String data = new Gson().toJson(event);
-    System.out.println("SENDING DATA " + data);
+    System.out.println("Sending data to " + conn.id);
     PrintWriter writer = conn.context.getResponse().getWriter();
     for (String datum : data.split("\r\n|\r|\n")) {
       writer.print("data: ");
