@@ -82,7 +82,7 @@
         }
         var html = buffer.join("");
         html = html.replace(/ /g,'&nbsp;');
-//        html = replLinks(html);
+        // html = replLinks(html);
         $(this).html(html);
         return this;
       };
@@ -112,21 +112,26 @@
 
               "\n" +
               "Type 'help' to show the available commands\n";
-      
-    	//Jquery socket
-      	$.socket.defaults.transports = ["sse", "stream"];
-      	$.socket.defaults.timeout = 5000;
-      //$.socket.defaults.heartbeat = 20000;
-      	$.socket("execute")
+
+      // The current connection id
+      var ID;
+
+      // jQuery socket
+      $.socket.defaults.transports = ["sse", "stream"];
+      $.socket.defaults.timeout = 5000;
+      // $.socket.defaults.heartbeat = 20000;
+      $.socket("execute")
     	.connecting(function() {
     		console.log("connecting ...");
     	})
     	.open(function() {
-    		console.log("connected!");
+        ID = this.option("id");
+    		console.log("connected " + ID);
     	})
     	.close(function(reason) {
-    		console.log("connection closed " + reason);
-    	});
+    		console.log("closed " + ID + ": " + reason);
+        ID = null;
+      });
 
       // Get welcome message
       $.ajax({
@@ -141,39 +146,32 @@
             cols: 110,
             commandHandle: function(line, report) {
             	$.socket("execute")
-            	.send("message", {line: line, width: 110})
+              .send("message", {line: line, width: 110})
             	.message(function(data){
             		var container;
-            		if(data === "it's done")
-            		{
+            		if(data === "it's done") {
             			container = $("<div class='jquery-console-message' style='display: inline'></div>");
-            		}
-            		else
-            		{
+            		} else {
             			var length = $(".jquery-console-message").length;
             			if(length == 1) {
             				container = $("<div class='jquery-console-message' style='display: inline'></div>");
             			} else {
             				container = $(".jquery-console-message")[length - 1];
             			}
-            			
             			$(data.elements).each(function(index, value) {
-                			var chunk = $("<span></span>").filledText(value.text);
-                      		if (value.fg) {
-                        		chunk.css('color', value.fg);
-                      		}
-                      		if (value.bg) {
-                        		chunk.css('background-color', value.bg);
-                      		}
-                      		if(value.text === "cls")
-                      		{
-                      			$(container).empty();	
-                      		}
-                      		else
-                      		{
-                      			$(container).append(chunk);                      			
-                      		}
-                		});
+                    var chunk = $("<span></span>").filledText(value.text);
+                      if (value.fg) {
+                        chunk.css('color', value.fg);
+                      }
+                      if (value.bg) {
+                        chunk.css('background-color', value.bg);
+                      }
+                      if(value.text === "cls") {
+                        $(container).empty();
+                      } else {
+                        $(container).append(chunk);
+                      }
+                  });
             		}
             		report(container);
             		
@@ -208,9 +206,13 @@
               }); */
             },
             cancelHandle: function() {
-              $.ajax({
-                url: "cancel"
-              });
+              if (ID != null) {
+                console.log("Cancelling " + ID);
+                $.ajax({
+                  url: "cancel",
+                  data: {id: ID}
+                });
+              }
             },
             completeHandle: function(prefix) {
               var ret = {};	

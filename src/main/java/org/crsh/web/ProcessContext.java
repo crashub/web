@@ -56,9 +56,14 @@ class ProcessContext implements ShellProcessContext {
     System.out.println("BEGAN " + line);
   }
 
+  void cancel() {
+    System.out.println("CANCELLING " + line);
+    process.cancel();
+  }
+
   public void end(ShellResponse response) {
     conn.current = null;
-    System.out.println("TERMINATED " + line);
+    System.out.println("TERMINATED " + line + " with " + response);
   }
 
   public int getWidth() {

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProcessServlet extends HttpServlet {
 
   /** . */
-  final Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
+  static final Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
 
   /** . */
   CRaSH crash;
@@ -84,7 +84,6 @@ public class ProcessServlet extends HttpServlet {
     Object data;
 
     public Event() {
-
     }
 
     public Event(String type) {
