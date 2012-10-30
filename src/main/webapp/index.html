@@ -176,14 +176,12 @@
                         chunk.css('background-color', value.bg);
                       }
                       if(value.text === "cls") {
-                        $(container).empty();
-//                        controller.inner.empty();
+                        controller.inner.find(":not(textarea)").remove();
                       } else {
                         $(container).append(chunk);
                       }
                   });
             		}
-            		//report(container);
 
                 // Poke directly the result
                 controller.inner.append(container);
