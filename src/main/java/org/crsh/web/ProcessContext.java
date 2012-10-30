@@ -36,13 +36,13 @@ class ProcessContext implements ShellProcessContext {
   private JsonArray buffer;
 
   /** . */
-  private Style.Composite style;
+  private Style style;
 
   ProcessContext(Connection conn, String line, int width) {
     this.conn = conn;
     this.line = line;
     this.width = width;
-    this.height = 40;
+    this.height = 34;
     this.buffer = null;
     this.style = Style.style();
   }
@@ -88,22 +88,25 @@ class ProcessContext implements ShellProcessContext {
   }
 
   public void provide(Chunk element) throws IOException {
-    if (element instanceof Style.Composite) {
-      style = (Style.Composite)style.merge((Style.Composite)element);
-    }
-    else {
+
+    // TODO : handle Color.def
+
+    if (element instanceof Style) {
+      style = style.merge((Style)element);
+    } else {
       JsonObject elt;
       if (element instanceof Text) {
         Text text = (Text)element;
         if (text.getText().length() > 0) {
           elt = new JsonObject();
           elt.addProperty("type", "text");
-          if (style != null && (style.getBackground() != null || style.getForeground() != null)) {
-            if (style.getForeground() != null) {
-              elt.addProperty("fg", style.getForeground().name());
+          if (style instanceof Style.Composite) {
+            Style.Composite composite = (Style.Composite)style;
+            if (composite.getForeground() != null) {
+              elt.addProperty("fg", composite.getForeground().name());
             }
-            if (style.getBackground() != null) {
-              elt.addProperty("bg", style.getBackground().name());
+            if (composite.getBackground() != null) {
+              elt.addProperty("bg", composite.getBackground().name());
             }
           }
           elt.addProperty("text", text.getText().toString());
