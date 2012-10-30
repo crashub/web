@@ -97,6 +97,7 @@ class ProcessContext implements ShellProcessContext {
         Text text = (Text)element;
         if (text.getText().length() > 0) {
           elt = new JsonObject();
+          elt.addProperty("type", "text");
           if (style != null && (style.getBackground() != null || style.getForeground() != null)) {
             if (style.getForeground() != null) {
               elt.addProperty("fg", style.getForeground().name());
@@ -111,7 +112,7 @@ class ProcessContext implements ShellProcessContext {
         }
       } else if (element instanceof CLS) {
         elt = new JsonObject();
-        elt.addProperty("text", "cls");
+        elt.addProperty("type", "cls");
       } else {
         elt = null;
       }

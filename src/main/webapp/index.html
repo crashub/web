@@ -138,17 +138,17 @@
 
           // Append
           $(data.elements).each(function(index, value) {
-            var chunk = $("<span></span>").filledText(value.text);
-            if (value.fg) {
-              chunk.css('color', value.fg);
-            }
-            if (value.bg) {
-              chunk.css('background-color', value.bg);
-            }
-            if(value.text === "cls") {
-              controller.inner.find(":not(textarea)").remove();
-            } else {
+            if (value.type == 'text') {
+              var chunk = $("<span></span>").filledText(value.text);
+              if (value.fg) {
+                chunk.css('color', value.fg);
+              }
+              if (value.bg) {
+                chunk.css('background-color', value.bg);
+              }
               $(container).append(chunk);
+            } else {
+              controller.inner.find(":not(textarea)").remove();
             }
           });
         }
