@@ -3,7 +3,6 @@ package org.crsh.web;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.crsh.shell.Shell;
 import org.crsh.shell.ShellProcess;
 import org.crsh.shell.ShellProcessContext;
 import org.crsh.shell.ShellResponse;
@@ -12,7 +11,6 @@ import org.crsh.text.Chunk;
 import org.crsh.text.Style;
 import org.crsh.text.Text;
 
-import javax.servlet.AsyncContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -51,7 +49,7 @@ class ProcessContext implements ShellProcessContext {
 
   void begin() {
     System.out.println("BEGINNING " + line);
-    process = conn.session.createProcess(line);
+    process = conn.shell.createProcess(line);
     process.execute(this);
     System.out.println("BEGAN " + line);
   }

@@ -1,6 +1,7 @@
 package org.crsh.web;
 
 import com.google.gson.Gson;
+import org.crsh.shell.Shell;
 import org.crsh.shell.impl.command.CRaSH;
 
 import javax.servlet.AsyncContext;
@@ -46,7 +47,9 @@ public class ProcessServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    SerializableTransient<Shell> shell = (SerializableTransient<Shell>)req.getSession().getAttribute("crash");
 
+    //
     String id = req.getParameter("id");
     String transport = req.getParameter("transport");
     AsyncContext context = req.startAsync();
@@ -66,7 +69,7 @@ public class ProcessServlet extends HttpServlet {
     writer.flush();
 
     //
-    Connection conn = new Connection(this, context, id);
+    Connection conn = new Connection(this, context, shell.object, id);
     connections.put(id, conn);
     context.addListener(conn);
   }

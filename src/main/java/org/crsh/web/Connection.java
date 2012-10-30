@@ -1,6 +1,6 @@
 package org.crsh.web;
 
-import org.crsh.shell.impl.command.CRaSHSession;
+import org.crsh.shell.Shell;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -22,16 +22,16 @@ class Connection implements AsyncListener
   final String id;
 
   /** . */
-  final CRaSHSession session;
+  final Shell shell;
 
   /** . */
   ProcessContext current;
 
-  Connection(ProcessServlet servlet, AsyncContext context, String id) {
+  Connection(ProcessServlet servlet, AsyncContext context, Shell shell, String id) {
     this.servlet = servlet;
     this.context = context;
     this.id = id;
-    this.session = servlet.crash.createSession(null);
+    this.shell = shell;
   }
 
   void process(ProcessServlet.Event event) {
@@ -45,7 +45,7 @@ class Connection implements AsyncListener
       }
 
       // Create a shell session if needed
-      if (session == null) {
+      if (shell == null) {
         // Should use request principal :-)
       }
 
