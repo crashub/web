@@ -27,7 +27,7 @@ import org.crsh.shell.ShellResponse;
 import com.google.gson.Gson;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
-@WebServlet(urlPatterns = "/execute", asyncSupported = true)
+//@WebServlet(urlPatterns = "/execute", asyncSupported = true)
 public class ExecuteServlet extends HttpServlet
 {
 
@@ -155,6 +155,7 @@ public class ExecuteServlet extends HttpServlet
 
 			public void onStartAsync(AsyncEvent event) throws IOException
 			{
+        System.out.println("SHOULD START");
 			}
 			public void onError(AsyncEvent event) throws IOException
 			{
