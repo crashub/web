@@ -67,7 +67,6 @@ public class ExecuteServlet extends HttpServlet
 
 		executor.execute(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				try
@@ -149,24 +148,18 @@ public class ExecuteServlet extends HttpServlet
 
 		context.addListener(new AsyncListener()
 		{
-			@Override
 			public void onTimeout(AsyncEvent event) throws IOException
 			{
 				connections.remove(id);
 			}
 
-			@Override
 			public void onStartAsync(AsyncEvent event) throws IOException
 			{
 			}
-
-			@Override
 			public void onError(AsyncEvent event) throws IOException
 			{
 				connections.remove(id);	
 			}
-
-			@Override
 			public void onComplete(AsyncEvent event) throws IOException
 			{
 				connections.remove(id);	

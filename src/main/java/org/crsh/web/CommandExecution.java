@@ -99,10 +99,6 @@ class CommandExecution implements ShellProcessContext
 		process.cancel();
 	}
 
-	/**
-	 * @see org.crsh.Pipe#provide(java.lang.Object)
-	 */
-	@Override
 	public void provide(Chunk element) throws IOException
 	{
 		if (element instanceof Composite)
@@ -138,10 +134,6 @@ class CommandExecution implements ShellProcessContext
 		}
 	}
 
-	/**
-	 * @see java.io.Flushable#flush()
-	 */
-	@Override
 	public void flush() throws IOException
 	{
 		source.data(json);
@@ -156,10 +148,6 @@ class CommandExecution implements ShellProcessContext
 	}
 	
 
-	/**
-	 * @see org.crsh.InteractionContext#getHeight()
-	 */
-	@Override
 	public int getHeight()
 	{
 		return 40;
