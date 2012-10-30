@@ -113,8 +113,9 @@
               "\n" +
               "Type 'help' to show the available commands\n";
 
-      // The current connection id
-      var ID;
+      //
+      var ID; // The current connection id
+      var reportRef; // The report function provided by the console
 
       // jQuery socket
       $.socket.defaults.transports = ["sse", "stream"];
@@ -131,6 +132,9 @@
     	.close(function(reason) {
     		console.log("closed " + ID + ": " + reason);
         ID = null;
+        if (reportRef != null) {
+          reportRef();
+        }
       });
 
       // Get welcome message
@@ -145,6 +149,11 @@
             welcomeMessage : data.welcome + demo,
             cols: 110,
             commandHandle: function(line, report) {
+
+              // Save report for later use
+              reportRef = report;
+
+              //
             	$.socket("execute")
               .send("message", {line: line, width: 110})
             	.message(function(data){
@@ -168,13 +177,17 @@
                       }
                       if(value.text === "cls") {
                         $(container).empty();
+//                        controller.inner.empty();
                       } else {
                         $(container).append(chunk);
                       }
                   });
             		}
-            		report(container);
-            		
+            		//report(container);
+
+                // Poke directly the result
+                controller.inner.append(container);
+
             		//clean up empty console prompt
             		$(".jquery-console-prompt-box .jquery-console-prompt").each(function() {
             			if($(this).html() === '') {

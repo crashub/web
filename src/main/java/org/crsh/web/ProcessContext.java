@@ -33,7 +33,7 @@ class ProcessContext implements ShellProcessContext {
   private ShellProcess process;
 
   /** . */
-  private final JsonArray buffer;
+  private JsonArray buffer;
 
   /** . */
   private Style.Composite style;
@@ -43,7 +43,7 @@ class ProcessContext implements ShellProcessContext {
     this.line = line;
     this.width = width;
     this.height = 40;
-    this.buffer = new JsonArray();
+    this.buffer = null;
     this.style = Style.style();
   }
 
@@ -91,32 +91,44 @@ class ProcessContext implements ShellProcessContext {
     if (element instanceof Style.Composite) {
       style = (Style.Composite)style.merge((Style.Composite)element);
     }
-    else if (element instanceof Text) {
-      Text text = (Text)element;
-      if (text.getText().length() > 0) {
-        JsonObject elt = new JsonObject();
-        if (style != null && (style.getBackground() != null || style.getForeground() != null)) {
-          if (style.getForeground() != null) {
-            elt.addProperty("fg", style.getForeground().name());
+    else {
+      JsonObject elt;
+      if (element instanceof Text) {
+        Text text = (Text)element;
+        if (text.getText().length() > 0) {
+          elt = new JsonObject();
+          if (style != null && (style.getBackground() != null || style.getForeground() != null)) {
+            if (style.getForeground() != null) {
+              elt.addProperty("fg", style.getForeground().name());
+            }
+            if (style.getBackground() != null) {
+              elt.addProperty("bg", style.getBackground().name());
+            }
           }
-          if (style.getBackground() != null) {
-            elt.addProperty("bg", style.getBackground().name());
-          }
+          elt.addProperty("text", text.getText().toString());
+        } else {
+          elt = null;
         }
-        elt.addProperty("text", text.getText().toString());
+      } else if (element instanceof CLS) {
+        elt = new JsonObject();
+        elt.addProperty("text", "cls");
+      } else {
+        elt = null;
+      }
+      if (elt != null) {
+        if (buffer == null) {
+          buffer = new JsonArray();
+        }
         buffer.add(elt);
       }
-    }
-    else if (element instanceof CLS) {
-      JsonObject elt = new JsonObject();
-      elt.addProperty("text", "cls");
-      buffer.add(elt);
     }
   }
 
   public void flush() throws IOException {
+    JsonArray tmp = buffer;
+    buffer = null;
     ExecuteServlet.Event event = new ExecuteServlet.Event("message");
-    event.data(buffer);
+    event.data(tmp);
     event.socket(conn.id);
     String data = new Gson().toJson(event);
     System.out.println("Sending data to " + conn.id);
