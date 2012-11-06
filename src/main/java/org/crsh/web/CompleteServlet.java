@@ -3,7 +3,7 @@ package org.crsh.web;
 import com.google.gson.Gson;
 import org.crsh.cmdline.CommandCompletion;
 import org.crsh.cmdline.Delimiter;
-import org.crsh.cmdline.spi.ValueCompletion;
+import org.crsh.cmdline.spi.Completion;
 import org.crsh.shell.Shell;
 import org.crsh.util.Strings;
 
@@ -29,7 +29,7 @@ public class CompleteServlet extends HttpServlet {
     Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
     String prefix = req.getParameter("prefix");
     CommandCompletion completion = shell.complete(prefix);
-    ValueCompletion completions = completion.getValue();
+    Completion completions = completion.getValue();
     List<String> values = new ArrayList<String>();
     if (completions.getSize() == 0) {
       // Do nothing
@@ -38,15 +38,15 @@ public class CompleteServlet extends HttpServlet {
       Delimiter delimiter = completion.getDelimiter();
       StringBuilder sb = new StringBuilder();
       if (completions.getSize() == 1) {
-        String suffix = completions.getSuffixes().iterator().next();
-        delimiter.escape(suffix, sb);
-        if ((Boolean)completions.get(suffix)) {
+        String value = completions.getValues().iterator().next();
+        delimiter.escape(value, sb);
+        if ((Boolean)completions.get(value)) {
           sb.append(delimiter.getValue());
         }
         values.add(sb.toString());
       }
       else {
-        String commonCompletion = Strings.findLongestCommonPrefix(completions.getSuffixes());
+        String commonCompletion = Strings.findLongestCommonPrefix(completions.getValues());
         if (commonCompletion.length() > 0) {
           delimiter.escape(commonCompletion, sb);
           values.add(sb.toString());

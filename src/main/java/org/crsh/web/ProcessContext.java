@@ -47,6 +47,14 @@ class ProcessContext implements ShellProcessContext {
     this.style = Style.style();
   }
 
+  public boolean takeAlternateBuffer() {
+    return false;
+  }
+
+  public boolean releaseAlternateBuffer() {
+    return false;
+  }
+
   void begin() {
     System.out.println("Executing " + line);
     process = conn.shell.createProcess(line);
