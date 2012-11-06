@@ -38,6 +38,9 @@ class ProcessContext implements ShellProcessContext {
   /** . */
   private Style style;
 
+  /** . */
+  private boolean useAlternate;
+
   ProcessContext(Connection conn, String line, int width) {
     this.conn = conn;
     this.line = line;
@@ -45,14 +48,33 @@ class ProcessContext implements ShellProcessContext {
     this.height = 34;
     this.buffer = null;
     this.style = Style.style();
+    this.useAlternate = false;
   }
 
   public boolean takeAlternateBuffer() {
-    return false;
+    if (!useAlternate) {
+      if (buffer == null) {
+        buffer = new JsonArray();
+      }
+      JsonObject elt = new JsonObject();
+      elt.addProperty("type", "takeAlternate");
+      buffer.add(elt);
+    }
+    useAlternate = true;
+    return true;
   }
 
   public boolean releaseAlternateBuffer() {
-    return false;
+    if (useAlternate) {
+      if (buffer == null) {
+        buffer = new JsonArray();
+      }
+      JsonObject elt = new JsonObject();
+      elt.addProperty("type", "releaseAlternate");
+      buffer.add(elt);
+    }
+    useAlternate = false;
+    return true;
   }
 
   void begin() {

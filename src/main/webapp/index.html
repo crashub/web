@@ -122,6 +122,24 @@
       var ID; // The current connection id
       var reportRef; // The report function provided by the console
       var controller; // The controller jQuery object
+      var alternate = null; // The alternate buffer
+
+      //
+      var takeAlternate = function() {
+        if (alternate == null) {
+          alternate = controller.inner.clone();
+        }
+      };
+
+      //
+      var releaseAlternate = function() {
+        if (alternate != null) {
+          var tmp = alternate;
+          alternate = null;
+          controller.inner.children(":not(textarea)").remove();
+          tmp.children(":not(textarea)").appendTo(controller.inner);
+        }
+      };
 
       // The function that handle messages from server
       var message = function(data) {
@@ -152,8 +170,14 @@
                 chunk.css('background-color', value.bg);
               }
               $(container).append(chunk);
-            } else {
+            } else if (value.type == 'cls') {
               controller.inner.find(":not(textarea)").remove();
+            } else if (value.type == 'takeAlternate') {
+              takeAlternate();
+            } else if (value.type == 'releaseAlternate') {
+              releaseAlternate();
+            } else {
+              // ?
             }
           });
         }
@@ -178,6 +202,7 @@
     	.close(function(reason) {
     		console.log("closed " + ID + ": " + reason);
         ID = null;
+        releaseAlternate();
         if (reportRef != null) {
           reportRef();
         }
