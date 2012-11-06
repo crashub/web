@@ -1,0 +1,3 @@
+- look at escape.js
+http://256.io/escapes.js/
+http://creativejs.com/2012/02/ansi-escapes-js/
