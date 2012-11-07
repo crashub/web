@@ -41,11 +41,11 @@ class ProcessContext implements ShellProcessContext {
   /** . */
   private boolean useAlternate;
 
-  ProcessContext(Connection conn, String line, int width) {
+  ProcessContext(Connection conn, String line, int width, int height) {
     this.conn = conn;
     this.line = line;
     this.width = width;
-    this.height = 34;
+    this.height = height;
     this.buffer = null;
     this.style = Style.style();
     this.useAlternate = false;

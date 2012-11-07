@@ -141,7 +141,7 @@
       //
       var releaseAlternate = function() {
         if (alternate) {
-          controller.inner.find("[:visible:not(textarea)").remove();
+          controller.inner.find(":visible:not(textarea)").remove();
           controller.inner.children(":hidden:not(textarea)").show();
           alternate = false;
         }
@@ -178,7 +178,7 @@
             $(container).append(chunk);
           } else if (value.type == 'cls') {
             // I don't get "find" needs to be used and "children" cannot make it work
-            controller.inner.find("[:visible:not(textarea)").remove();
+            controller.inner.find(":visible:not(textarea)").remove();
           } else if (value.type == 'takeAlternate') {
             takeAlternate();
           } else if (value.type == 'releaseAlternate') {
@@ -230,8 +230,20 @@
               // Save report for later use (in closed event)
               reportRef = report;
 
+              // Compute width
+              var metric = $("#metric").get(0);
+              var fontWidth = metric.clientWidth;
+              var fontHeight = metric.clientHeight;
+              var consoleWidth = $("#console").innerWidth();
+              var consoleHeight = $("#console").innerHeight();
+              var width = consoleWidth / fontWidth;
+              var height = consoleHeight / fontHeight;
+
+              // For now we hardcode ... seems there are issues we won't solve for now
+              width = 132;
+
               // Send message
-            	$.socket("execute").send("message", {line: line, width: 110});
+            	$.socket("execute").send("message", {line: line, width: width, height: height});
             },
             cancelHandle: function() {
               if (ID != null) {
@@ -304,6 +316,11 @@
     <p>Sponsored by <a href="http://www.exoplatform.com">eXo Platform</a></p>
   </footer>
 
+</div>
+
+<!-- Used to determine font metric -->
+<div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
+  <div class="jquery-console-message">A</div>
 </div>
 
 

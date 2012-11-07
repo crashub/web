@@ -51,14 +51,18 @@ class Connection implements AsyncListener
         Map<String, Object> map = (Map<String, Object>) event.data;
         String line = (String)map.get("line");
         Double widthP = (Double)map.get("width");
-        int width = 80;
-        if (widthP != null)
-        {
+        Double heightP = (Double)map.get("height");
+        int width = 110;
+        if (widthP != null) {
           width = widthP.intValue();
+        }
+        int height = 30;
+        if (heightP != null) {
+          height = heightP.intValue();
         }
 
         // Execute process and we are done
-        current = new ProcessContext(this, line, width);
+        current = new ProcessContext(this, line, width, height);
         current.begin();
       }
     } else {
