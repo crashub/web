@@ -39,21 +39,27 @@
       var target = document.getElementById('console');
       var spinner = new Spinner(opts).spin(target);
 
-      // Integrate spinner
-      var cancel;
-      window.showSpinner = function() {
-        spinner.spin(target)
-      };
-      $(document).ajaxStart(function() {
+      // Spinner control
+      // spinner start with ajax request
+      // spinner stop with ajax request OR at the first message pushed by the server
+      var spinnerStart = function() {
         t = setTimeout("showSpinner()", 100)
-      });
-      $(document).ajaxStop(function() {
+      };
+      var spinnerStop = function() {
         var tmp = t;
         if (tmp) {
           clearTimeout(tmp);
         }
         spinner.stop();
-      });
+      };
+
+      // Integrate spinner
+      var cancel;
+      window.showSpinner = function() {
+        spinner.spin(target)
+      };
+      $(document).ajaxStart(spinnerStart);
+      $(document).ajaxStop(spinnerStop);
 
       // Utility function
       var replLinks = function(text) {
@@ -143,6 +149,10 @@
 
       // The function that handle messages from server
       var message = function(data) {
+
+        // Stop spinner (if it wasn't already stopped)
+        spinnerStop();
+
         var container;
         if (data === "it's done") {
           container = $("<div class='jquery-console-message' style='display: inline'></div>");
