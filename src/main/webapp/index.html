@@ -128,22 +128,22 @@
       var ID; // The current connection id
       var reportRef; // The report function provided by the console
       var controller; // The controller jQuery object
-      var alternate = null; // The alternate buffer
+      var alternate = false; // The alternate buffer
 
       //
       var takeAlternate = function() {
-        if (alternate == null) {
-          alternate = controller.inner.clone();
+        if (!alternate) {
+          controller.inner.children(":not(textarea)").hide();
+          alternate = true;
         }
       };
 
       //
       var releaseAlternate = function() {
-        if (alternate != null) {
-          var tmp = alternate;
-          alternate = null;
-          controller.inner.children(":not(textarea)").remove();
-          tmp.children(":not(textarea)").appendTo(controller.inner);
+        if (alternate) {
+          controller.inner.find("[:visible:not(textarea)").remove();
+          controller.inner.children(":hidden:not(textarea)").show();
+          alternate = false;
         }
       };
 
@@ -153,8 +153,8 @@
         // Stop spinner (if it wasn't already stopped)
         spinnerStop();
 
-        // Find the jquery-console-message that is also the last child (it may be null)
-        var last = controller.inner.find(".jquery-console-message:last-child");
+        // Find the visible jquery-console-message that is also the last child (it may be null)
+        var last = controller.inner.find(".jquery-console-message:visible:last-child");
 
         // Use the jquery-console-message element if that's the last one
         // otherwise create a new one
@@ -177,7 +177,8 @@
             }
             $(container).append(chunk);
           } else if (value.type == 'cls') {
-            controller.inner.find(":not(textarea)").remove();
+            // I don't get "find" needs to be used and "children" cannot make it work
+            controller.inner.find("[:visible:not(textarea)").remove();
           } else if (value.type == 'takeAlternate') {
             takeAlternate();
           } else if (value.type == 'releaseAlternate') {
