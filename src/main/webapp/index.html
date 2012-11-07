@@ -153,44 +153,39 @@
         // Stop spinner (if it wasn't already stopped)
         spinnerStop();
 
+        // Find the jquery-console-message that is also the last child (it may be null)
+        var last = controller.inner.find(".jquery-console-message:last-child");
+
+        // Use the jquery-console-message element if that's the last one
+        // otherwise create a new one
         var container;
-        if (data === "it's done") {
+        if(last.length == 0) {
           container = $("<div class='jquery-console-message' style='display: inline'></div>");
         } else {
-
-          // Find the jquery-console-message that is also the last child (it may be null)
-          var last = controller.inner.find(".jquery-console-message:last-child");
-
-          // Use the jquery-console-message element if that's the last one
-          // otherwise create a new one
-          if(last.length == 0) {
-            container = $("<div class='jquery-console-message' style='display: inline'></div>");
-          } else {
-            container = last[0];
-          }
-
-          // Append
-          $(data.elements).each(function(index, value) {
-            if (value.type == 'text') {
-              var chunk = $("<span></span>").filledText(value.text);
-              if (value.fg) {
-                chunk.css('color', value.fg);
-              }
-              if (value.bg) {
-                chunk.css('background-color', value.bg);
-              }
-              $(container).append(chunk);
-            } else if (value.type == 'cls') {
-              controller.inner.find(":not(textarea)").remove();
-            } else if (value.type == 'takeAlternate') {
-              takeAlternate();
-            } else if (value.type == 'releaseAlternate') {
-              releaseAlternate();
-            } else {
-              // ?
-            }
-          });
+          container = last[0];
         }
+
+        // Append
+        $(data.elements).each(function(index, value) {
+          if (value.type == 'text') {
+            var chunk = $("<span></span>").filledText(value.text);
+            if (value.fg) {
+              chunk.css('color', value.fg);
+            }
+            if (value.bg) {
+              chunk.css('background-color', value.bg);
+            }
+            $(container).append(chunk);
+          } else if (value.type == 'cls') {
+            controller.inner.find(":not(textarea)").remove();
+          } else if (value.type == 'takeAlternate') {
+            takeAlternate();
+          } else if (value.type == 'releaseAlternate') {
+            releaseAlternate();
+          } else {
+            // ?
+          }
+        });
 
         // Poke directly the result
         controller.inner.append(container);
