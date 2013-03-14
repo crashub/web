@@ -1,9 +1,9 @@
 package org.crsh.web;
 
 import com.google.gson.Gson;
-import org.crsh.cmdline.CommandCompletion;
-import org.crsh.cmdline.Delimiter;
-import org.crsh.cmdline.spi.Completion;
+import org.crsh.cli.impl.Delimiter;
+import org.crsh.cli.impl.completion.CompletionMatch;
+import org.crsh.cli.spi.Completion;
 import org.crsh.shell.Shell;
 import org.crsh.util.Strings;
 
@@ -28,7 +28,7 @@ public class CompleteServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
     String prefix = req.getParameter("prefix");
-    CommandCompletion completion = shell.complete(prefix);
+    CompletionMatch completion = shell.complete(prefix);
     Completion completions = completion.getValue();
     List<String> values = new ArrayList<String>();
     if (completions.getSize() == 0) {

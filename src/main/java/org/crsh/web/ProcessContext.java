@@ -51,6 +51,10 @@ class ProcessContext implements ShellProcessContext {
     this.useAlternate = false;
   }
 
+  public Class<Chunk> getConsumedType() {
+    return Chunk.class;
+  }
+
   public boolean takeAlternateBuffer() {
     if (!useAlternate) {
       if (buffer == null) {

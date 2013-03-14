@@ -2,7 +2,6 @@ package org.crsh.web;
 
 import com.google.gson.Gson;
 import org.crsh.shell.Shell;
-import org.crsh.shell.impl.command.CRaSH;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -22,12 +21,8 @@ public class ExecuteServlet extends HttpServlet {
   /** . */
   static final Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
 
-  /** . */
-  CRaSH crash;
-
   @Override
   public void init() throws ServletException {
-    crash = (CRaSH)getServletContext().getAttribute("crash");
   }
 
   @Override
