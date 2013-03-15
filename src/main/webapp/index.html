@@ -318,10 +318,43 @@
 
 </div>
 
+<input id="ghi" type="text" value="hello"/>
+<textarea id="def" rows="16" cols="80">
+class foo {
+    @Command
+    public void main() {
+        out <<< "hello world";
+    }
+}
+</textarea>
+<input id="abc" type="submit" name="save"/>
+
 <!-- Used to determine font metric -->
 <div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
   <div class="jquery-console-message">A</div>
 </div>
+
+<script type="text/javascript">
+$(function() {
+    $("#abc").on("click", function() {
+        var name = $("input#ghi").val();
+        var script = $("textarea#def").val();
+        $.ajax({
+            type: "POST",
+            url: "script",
+            data: { "name": name, "script": script },
+            statusCode: {
+                400: function(xhr, status, response) {
+                    // We should ensure that the response content type is json
+                    var json = $.parseJSON(xhr.responseText);
+                    alert(json.message);
+                }
+            }
+        });
+    });
+
+})
+</script>
 
 
 </body>

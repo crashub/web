@@ -4,6 +4,7 @@ import org.crsh.plugin.PluginContext;
 import org.crsh.plugin.WebPluginLifeCycle;
 import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
+import org.crsh.shell.impl.command.CRaSHShellFactory;
 import org.crsh.util.Safe;
 import org.crsh.vfs.FS;
 import org.crsh.vfs.Path;
@@ -19,14 +20,23 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebListener
 public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener, ServletRequestListener
 {
 
+  public static LifeCycle getLifeCycle(ServletContext sc) {
+    return registry.get(sc.getContextPath());
+  }
+
+  /** . */
+  private static final ConcurrentHashMap<String, LifeCycle> registry = new ConcurrentHashMap<String, LifeCycle>();
+
 	/** . */
-	private ShellFactory crash;
+	private CRaSHShellFactory crash;
 
   /** . */
   private final SimpleFS commands = new SimpleFS();
@@ -42,7 +52,7 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
   public void sessionCreated(HttpSessionEvent se)
 	{
 		HttpSession session = se.getSession();
-		Shell shell = crash.create(null);
+		Shell shell = crash.create(null, false);
 		session.setAttribute("crash", new SerializableTransient<Shell>(shell));
 	}
 
@@ -64,7 +74,10 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     PluginContext context = getPluginContext(sce.getServletContext());
 
     //
-    crash = context.getPlugin(ShellFactory.class);
+    crash = (CRaSHShellFactory)context.getPlugin(ShellFactory.class);
+
+    //
+    registry.put(sce.getServletContext().getContextPath(), this);
 	}
 
   @Override
@@ -94,11 +107,18 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
 
   public void contextDestroyed(ServletContextEvent sce)
 	{
-    super.contextDestroyed(sce);
+    registry.remove(sce.getServletContext().getContextPath());
 
     //
     if (crash != null) {
       crash = null;
     }
+
+    //
+    super.contextDestroyed(sce);
 	}
+
+  public SimpleFS getCommands() {
+    return commands;
+  }
 }
