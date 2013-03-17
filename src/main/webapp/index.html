@@ -5,6 +5,8 @@
   <title></title>
 
   <link rel="stylesheet" type="text/css" href="css/console.css"/>
+  <link rel="stylesheet" href="css/codemirror.css">
+
   <!--
     <link rel="stylesheet/less" type="text/css" href="less/console.less"/>
     <script type="text/javascript" src="less-1.3.0.min.js"></script>
@@ -14,7 +16,8 @@
   <script type="text/javascript" src="jquery-1.7.js"></script>
   <script type="text/javascript" src="jquery.console.js"></script>
   <script type="text/javascript" src="jquery.socket-1.0b3.js"></script>
-
+  <script type="text/javascript" src="codemirror.js"></script>
+  <script type="text/javascript" src="groovy.js"></script>
   <script type="text/javascript">
   
     $(document).ready(function() {
@@ -270,7 +273,27 @@
           });
         }
       });
-    })
+
+      // Code mirror
+      var textarea = $("#def").each(function() {
+        var editor = CodeMirror.fromTextArea(this, {
+          mode: "groovy",
+          lineNumbers: true,
+          textWrapping: false,
+          tabindex: 2
+//        height: "300px",
+//        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
+//        stylesheet: "/css/jscolors.css",
+//        path: "/js/",
+//        continuousScanning: 500,
+//        lineNumbers: true,
+//        tabMode: "spaces",
+//        submitFunction: function() {
+//          jQuery("#executeButton").click();
+//        }
+        });
+      });
+    });
   </script>
 
   <!-- Google Analytics -->
@@ -321,10 +344,10 @@
 <input id="ghi" type="text" value="hello"/>
 <textarea id="def" rows="16" cols="80">
 class foo {
-    @Command
-    public void main() {
-        out <<< "hello world";
-    }
+  @Command
+  public void main() {
+    out << "hello world";
+  }
 }
 </textarea>
 <input id="abc" type="submit" name="save"/>
