@@ -289,7 +289,7 @@
             "</form>" +
             "</div>");
           $("#tab-content").append(pane);
-          $("#nav-tabs").append(tab);
+          $("#nav-tabs li:last").before(tab);
           var textarea = pane.find("textarea").each(function() {
             var editor = CodeMirror.fromTextArea(this, {
               mode: "groovy",
@@ -377,32 +377,12 @@
       <div class="tabbable tabs-right">
         <ul id="nav-tabs" class="nav nav-tabs">
           <li class="active"><a href="#tab0" data-toggle="tab">Console</a></li>
-<!--
-          <li><a href="#tab2" data-toggle="tab">Todo</a></li>
--->
-          <li><a href="#myModal" data-toggle="modal">Add</a></li>
+          <li><a href="#myModal" data-toggle="modal"><i class="icon-plus-sign-alt"></i></a></li>
         </ul>
         <div id="tab-content" class="tab-content">
           <div class="tab-pane active" id="tab0">
             <div id="console" class="console"></div>
           </div>
-<!--
-          <div class="tab-pane" id="tab2">
-            <div>
-            <form>
-              <textarea id="def" rows="16" cols="80">
-class foo {
-  @Command
-  public void main() {
-    out << "hello world";
-  }
-}
-              </textarea>
-              &lt;!&ndash;<input id="abc" type="submit" name="save"/>&ndash;&gt;
-            </form>
-            </div>
-          </div>
--->
         </div>
       </div>
     </div>
