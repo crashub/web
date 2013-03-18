@@ -17,7 +17,8 @@
   <script type="text/javascript" src="jquery.console.js"></script>
   <script type="text/javascript" src="jquery.socket-1.0b3.js"></script>
   <script type="text/javascript" src="bootstrap-tab.js"></script>
-  <script type="text/javascript" src="bootstrap-modal.js"></script>
+  <script type="text/javascript" src="bootstrap-tooltip.js"></script>
+  <script type="text/javascript" src="bootstrap-popover.js"></script>
   <script type="text/javascript" src="codemirror.js"></script>
   <script type="text/javascript" src="groovy.js"></script>
   <script type="text/javascript">
@@ -273,49 +274,16 @@
         }
       });
 
-      // Create a new command tab
+      // Editors (model)
       var editorObjects = {};
       var tabSeq = 1; // 0 == console
-      $("#create-command").on("click", function() {
-        var name = $("#command-name").val();
-        if (name == null || name.length == 0) {
-          alert("Invalid name");
-        } else {
-          var tabId = "tab" + tabSeq++;
-          var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
-          var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
-            '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
-            "<form><textarea rows='16'' cols='80'>public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}</textarea>" +
-            "</form>" +
-            "</div>");
-          $("#tab-content").append(pane);
-          $("#nav-tabs li:last").before(tab);
-          var textarea = pane.find("textarea").each(function() {
-            var editor = CodeMirror.fromTextArea(this, {
-              mode: "groovy",
-              lineNumbers: true,
-              lineWrapping: false,
-              tabindex: 2
-            });
-              editorObjects[tabId] = {
-              "name": name,
-              "editor": editor
-            }
-          });
-          $("#myModal form").each(function() {
-            this.reset();
-          });
-          tab.find("a").tab("show");
-          $('#myModal').modal('hide');
-        }
-      });
 
       // Refresh editor when tab changes
       $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
         var id = $(e.target).attr("href").substring(1);
         var editorObject = editorObjects[id];
         if (editorObject != null) {
-            editorObject.editor.refresh();
+          editorObject.editor.refresh();
         }
       });
 
@@ -340,6 +308,42 @@
         });
       });
 
+      // Add command pop over
+      $("[rel=popover]").popover();
+      $("body").on("keyup", "#command-name", function(e) {
+        if (e.keyCode == 27) {
+          $('[rel=popover]').popover('hide');
+        } else if (e.keyCode == 13) {
+          var name = $(this).val();
+          if (name == null || name.length == 0) {
+            alert("Invalid name");
+          } else {
+            var tabId = "tab" + tabSeq++;
+            var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
+            var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
+              '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
+              "<form><textarea rows='16'' cols='80'>public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}</textarea>" +
+              "</form>" +
+              "</div>");
+            $("#tab-content").append(pane);
+            $("#nav-tabs li:last").before(tab);
+            var textarea = pane.find("textarea").each(function() {
+              var editor = CodeMirror.fromTextArea(this, {
+                mode: "groovy",
+                lineNumbers: true,
+                lineWrapping: false,
+                tabindex: 2
+              });
+              editorObjects[tabId] = {
+                "name": name,
+                "editor": editor
+              }
+            });
+            tab.find("a").tab("show");
+            $('[rel=popover]').popover('hide');
+          }
+        }
+      });
     });
   </script>
 
@@ -380,7 +384,16 @@
       <div class="tabbable tabs-right">
         <ul id="nav-tabs" class="nav nav-tabs">
           <li class="active"><a href="#tab0" data-toggle="tab">Console</a></li>
-          <li><a href="#myModal" data-toggle="modal"><i class="icon-plus-sign-alt"></i></a></li>
+          <li>
+            <a
+              href="#"
+              class="btn"
+              rel="popover"
+              data-placement="bottom"
+              data-html="true"
+              data-content="<input id='command-name' type='text'/>"
+              data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
+          </li>
         </ul>
         <div id="tab-content" class="tab-content">
           <div class="tab-pane active" id="tab0">
@@ -395,25 +408,6 @@
 <!-- Used to determine font metric -->
 <div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
   <div class="jquery-console-message">A</div>
-</div>
-
-<!-- Modal -->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <h3 id="myModalLabel">Create a new command</h3>
-  </div>
-  <div class="modal-body">
-    <form>
-      <fieldset>
-        <label>Command name</label>
-        <input id="command-name" type="text"/>
-      </fieldset>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    <button id="create-command" class="btn btn-primary">Create</button>
-  </div>
 </div>
 
 <hr>
