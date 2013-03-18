@@ -302,6 +302,9 @@
               "editor": editor
             }
           });
+          $("#myModal form").each(function() {
+            this.reset();
+          });
           tab.find("a").tab("show");
           $('#myModal').modal('hide');
         }
