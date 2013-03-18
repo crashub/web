@@ -14,7 +14,9 @@ div.console {
 div.console div.jquery-console-inner {
   height:(@baseLineHeight * 30);
   margin:0.5em;
-  overflow:auto;
+  word-wrap: break-word;
+  overflow-x: hidden;
+  overflow-y:auto;
 }
 div.console div.jquery-console-prompt-box {
   color:@headingsColor;
