@@ -237,13 +237,10 @@
               var metric = $("#metric").get(0);
               var fontWidth = metric.clientWidth;
               var fontHeight = metric.clientHeight;
-              var consoleWidth = $("#console").innerWidth();
-              var consoleHeight = $("#console").innerHeight();
+              var consoleWidth = $(".jquery-console-inner").innerWidth();
+              var consoleHeight = $(".jquery-console-inner").innerHeight();
               var width = consoleWidth / fontWidth;
               var height = consoleHeight / fontHeight;
-
-              // For now we hardcode ... seems there are issues we won't solve for now
-              width = 132;
 
               // Send message
             	$.socket("execute").send("message", {line: line, width: width, height: height});
@@ -327,10 +324,11 @@
   </div>
 </div>
 
-<div class="container">
-
-  <div class="center">
-    <div id="console" class="console">
+<div class="container-fluid">
+  <div class="row-fluid">
+    <!--<div class="span2">FOO</div>-->
+    <div class="span12">
+      <div id="console" class="console">
     </div>
   </div>
 
@@ -338,7 +336,6 @@
   <footer>
     <p>Sponsored by <a href="http://www.exoplatform.com">eXo Platform</a></p>
   </footer>
-
 </div>
 
 <input id="ghi" type="text" value="hello"/>
