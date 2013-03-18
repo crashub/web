@@ -16,6 +16,8 @@
   <script type="text/javascript" src="jquery-1.7.js"></script>
   <script type="text/javascript" src="jquery.console.js"></script>
   <script type="text/javascript" src="jquery.socket-1.0b3.js"></script>
+  <script type="text/javascript" src="bootstrap-tab.js"></script>
+  <script type="text/javascript" src="bootstrap-modal.js"></script>
   <script type="text/javascript" src="codemirror.js"></script>
   <script type="text/javascript" src="groovy.js"></script>
   <script type="text/javascript">
@@ -271,25 +273,70 @@
         }
       });
 
-      // Code mirror
-      var textarea = $("#def").each(function() {
-        var editor = CodeMirror.fromTextArea(this, {
-          mode: "groovy",
-          lineNumbers: true,
-          textWrapping: false,
-          tabindex: 2
-//        height: "300px",
-//        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-//        stylesheet: "/css/jscolors.css",
-//        path: "/js/",
-//        continuousScanning: 500,
-//        lineNumbers: true,
-//        tabMode: "spaces",
-//        submitFunction: function() {
-//          jQuery("#executeButton").click();
-//        }
+      // Create a new command tab
+      var editorObjects = {};
+      var tabSeq = 1; // 0 == console
+      $("#create-command").on("click", function() {
+        var name = $("#command-name").val();
+        if (name == null || name.length == 0) {
+          alert("Invalid name");
+        } else {
+          var tabId = "tab" + tabSeq++;
+          var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
+          var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
+            '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
+            "<form><textarea rows='16'' cols='80'>public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}</textarea>" +
+            "</form>" +
+            "</div>");
+          $("#tab-content").append(pane);
+          $("#nav-tabs").append(tab);
+          var textarea = pane.find("textarea").each(function() {
+            var editor = CodeMirror.fromTextArea(this, {
+              mode: "groovy",
+              lineNumbers: true,
+              lineWrapping: false,
+              tabindex: 2
+            });
+              editorObjects[tabId] = {
+              "name": name,
+              "editor": editor
+            }
+          });
+          tab.find("a").tab("show");
+          $('#myModal').modal('hide');
+        }
+      });
+
+      // Refresh editor when tab changes
+      $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
+        var id = $(e.target).attr("href").substring(1);
+        var editorObject = editorObjects[id];
+        if (editorObject != null) {
+            editorObject.editor.refresh();
+        }
+      });
+
+      // Save
+      $('body').on("click", "i.icon-save", function() {
+        var id = $(this).closest(".tab-pane").attr("id");
+        var editorObject = editorObjects[id];
+        $.ajax({
+          type: "POST",
+          url: "script",
+          data: {
+            "name": editorObject.editor.name,
+            "script": editorObject.editor.getValue()
+          },
+          statusCode: {
+            400: function(xhr, status, response) {
+              // We should ensure that the response content type is json
+              var json = $.parseJSON(xhr.responseText);
+              alert(json.message);
+            }
+          }
         });
       });
+
     });
   </script>
 
@@ -324,57 +371,72 @@
   </div>
 </div>
 
-<div class="container-fluid">
-  <div class="row-fluid">
-    <!--<div class="span2">FOO</div>-->
+<div class="container">
+  <div class="row">
     <div class="span12">
-      <div id="console" class="console">
-    </div>
-  </div>
-
-  <hr>
-  <footer>
-    <p>Sponsored by <a href="http://www.exoplatform.com">eXo Platform</a></p>
-  </footer>
-</div>
-
-<input id="ghi" type="text" value="hello"/>
-<textarea id="def" rows="16" cols="80">
+      <div class="tabbable tabs-right">
+        <ul id="nav-tabs" class="nav nav-tabs">
+          <li class="active"><a href="#tab0" data-toggle="tab">Console</a></li>
+<!--
+          <li><a href="#tab2" data-toggle="tab">Todo</a></li>
+-->
+          <li><a href="#myModal" data-toggle="modal">Add</a></li>
+        </ul>
+        <div id="tab-content" class="tab-content">
+          <div class="tab-pane active" id="tab0">
+            <div id="console" class="console"></div>
+          </div>
+<!--
+          <div class="tab-pane" id="tab2">
+            <div>
+            <form>
+              <textarea id="def" rows="16" cols="80">
 class foo {
   @Command
   public void main() {
     out << "hello world";
   }
 }
-</textarea>
-<input id="abc" type="submit" name="save"/>
+              </textarea>
+              &lt;!&ndash;<input id="abc" type="submit" name="save"/>&ndash;&gt;
+            </form>
+            </div>
+          </div>
+-->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Used to determine font metric -->
 <div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
   <div class="jquery-console-message">A</div>
 </div>
 
-<script type="text/javascript">
-$(function() {
-    $("#abc").on("click", function() {
-        var name = $("input#ghi").val();
-        var script = $("textarea#def").val();
-        $.ajax({
-            type: "POST",
-            url: "script",
-            data: { "name": name, "script": script },
-            statusCode: {
-                400: function(xhr, status, response) {
-                    // We should ensure that the response content type is json
-                    var json = $.parseJSON(xhr.responseText);
-                    alert(json.message);
-                }
-            }
-        });
-    });
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <h3 id="myModalLabel">Create a new command</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <fieldset>
+        <label>Command name</label>
+        <input id="command-name" type="text"/>
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button id="create-command" class="btn btn-primary">Create</button>
+  </div>
+</div>
 
-})
-</script>
+<hr>
+<footer>
+    <p>Sponsored by <a href="http://www.exoplatform.com">eXo Platform</a></p>
+</footer>
 
 
 </body>
