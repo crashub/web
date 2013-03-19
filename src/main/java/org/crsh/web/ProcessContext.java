@@ -10,6 +10,7 @@ import org.crsh.text.CLS;
 import org.crsh.text.Chunk;
 import org.crsh.text.Style;
 import org.crsh.text.Text;
+import org.crsh.util.Safe;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -93,6 +94,15 @@ class ProcessContext implements ShellProcessContext {
   }
 
   public void end(ShellResponse response) {
+
+    // Send last message
+    String msg = response.getMessage();
+    if (msg.length() > 0) {
+      provide(Text.create(msg));
+      Safe.flush(this);
+    }
+
+    //
     conn.current = null;
     System.out.println("Terminated " + line + " with " + response);
     try {
@@ -121,7 +131,7 @@ class ProcessContext implements ShellProcessContext {
     return null;
   }
 
-  public void provide(Chunk element) throws IOException {
+  public void provide(Chunk element) {
 
     // TODO : handle Color.def
 
