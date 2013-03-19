@@ -1,5 +1,6 @@
 @import "bootstrap/bootstrap.less";
 @import "themes/cerulean/bootswatch.less";
+@import "themes/cerulean/variables.less";
 @import "font/font-awesome.less";
 
 body {
@@ -20,11 +21,11 @@ div.console div.jquery-console-inner {
   overflow-y:auto;
 }
 div.console div.jquery-console-prompt-box {
-  color:@headingsColor;
+  color:@textColor;
   font-family:monospace;
 }
 div.console div.jquery-console-focus span.jquery-console-cursor {
-  background:@headingsColor;
+  background:@textColor;
   color:@bodyBackground;
   font-weight:bold;
 }
