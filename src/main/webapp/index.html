@@ -290,7 +290,8 @@
       });
 
       // Save
-      $('body').on("click", "i.icon-save", function() {
+      $('body').on("click", "i.icon-save", function(e) {
+        e.preventDefault();
         var id = $(this).closest(".tab-pane").attr("id");
         var editorObject = editorObjects[id];
         $.ajax({
@@ -312,10 +313,14 @@
       });
 
       // Add command pop over
-      $("[rel=popover]").popover();
+      $("#add-command").on("click", function(e) {
+        $("#add-command").popover("show");
+        $("#command-name").focus();
+        e.preventDefault();
+      });
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 27) {
-          $('[rel=popover]').popover('hide');
+          $('#add-command').popover('hide');
         } else if (e.keyCode == 13) {
           var name = $(this).val();
           if (name == null || name.length == 0) {
@@ -342,8 +347,8 @@
                 "editor": editor
               }
             });
+            $('#add-command').popover('hide');
             tab.find("a").tab("show");
-            $('[rel=popover]').popover('hide');
           }
         }
       });
@@ -389,11 +394,12 @@
           <li class="active"><a href="#tab0" data-toggle="tab">Console</a></li>
           <li>
             <a
+              id="add-command"
               href="#"
               class="btn"
-              rel="popover"
               data-placement="bottom"
               data-html="true"
+              data-trigger="manual"
               data-content="<input id='command-name' type='text'/>"
               data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
           </li>
