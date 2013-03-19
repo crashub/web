@@ -281,6 +281,11 @@
       $('a[href="#tab0"]').on("shown", function() {
         $("#console").trigger("click");
       });
+      // Clear the shell (except the last div that is the prompt box)
+      $(".clear-shell").on("click", function(e) {
+        e.preventDefault();
+        $(".jquery-console-inner > div:not(:last)").remove();
+      });
 
       // Editors (model)
       var editors = {};
@@ -452,6 +457,11 @@
         </ul>
         <div id="tab-content" class="tab-content">
           <div class="tab-pane active" id="tab0">
+            <div class="btn-toolbar">
+              <div class="btn-group btn-group-vertical" style="float:right">
+                <a class="btn clear-shell" href="#"><i class="icon-trash"></i></a>
+              </div>
+            </div>
             <div id="console" class="console"></div>
           </div>
         </div>
