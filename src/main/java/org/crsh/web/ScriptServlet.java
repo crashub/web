@@ -23,6 +23,20 @@ public class ScriptServlet extends HttpServlet {
   static final Gson gson = new Gson();
 
   @Override
+  protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String name = req.getParameter("name");
+    if (name == null) {
+      super.doDelete(req, resp);
+    } else {
+      // Save the command
+      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+      SimpleFS commands = lf.getCommands();
+      commands.remove(name);
+      resp.setStatus(HttpServletResponse.SC_OK);
+    }
+  }
+
+  @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String script = req.getParameter("script");
     if (script == null) {

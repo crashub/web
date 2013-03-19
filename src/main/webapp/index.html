@@ -280,50 +280,21 @@
       var editorObjects = {};
       var tabSeq = 1; // 0 == console
 
-      // Refresh editor when tab changes
-      $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
-        var id = $(e.target).attr("href").substring(1);
-        var editorObject = editorObjects[id];
-        if (editorObject != null) {
-          editorObject.editor.refresh();
-        }
-      });
-
-      // Save
-      $('body').on("click", "i.icon-save", function(e) {
-        e.preventDefault();
-        var id = $(this).closest(".tab-pane").attr("id");
-        var editorObject = editorObjects[id];
-        $.ajax({
-          type: "POST",
-          url: "script",
-          data: {
-            "name": editorObject.editor.name,
-            "script": editorObject.editor.getValue()
-          },
-          statusCode: {
-            400: function(xhr, status, response) {
-              // We should ensure that the response content type is json
-              var json = $.parseJSON(xhr.responseText);
-              $("#compilation-error-dialog-body").text(json.message);
-              $('#compilation-error-dialog').modal("show")
-            }
-          }
-        });
-      });
-
-      // Load function
-      var load = function(name, script) {
+      // Script functions
+      var addScript = function(name, script) {
         var tabId = "tab" + tabSeq++;
         var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
-        var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
-          '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
-          "<form><textarea rows='16' cols='80'></textarea>" +
-          "</form>" +
-          "</div>");
+        var pane = $('<div id="' + tabId + '" class="tab-pane">' +
+          '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right">' +
+          '<a class="btn save-command" href="#"><i class="icon-save"></i></a>' +
+          '<a class="btn remove-command" href="#"><i class="icon-trash"></i></a>' +
+          '</div></div>' +
+          '<form><textarea rows="16"" cols="80"></textarea>' +
+          '</form>' +
+          '</div>');
         $("#tab-content").append(pane);
         $("#nav-tabs li:last").before(tab);
-        var textarea = pane.find("textarea").each(function() {
+          var textarea = pane.find("textarea").each(function() {
           var editor = CodeMirror.fromTextArea(this, {
             mode: "groovy",
             lineNumbers: true,
@@ -338,6 +309,54 @@
         });
         return tab;
       };
+
+      // Refresh editor when tab changes
+      $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
+        var id = $(e.target).attr("href").substring(1);
+        var editorObject = editorObjects[id];
+        if (editorObject != null) {
+          editorObject.editor.refresh();
+        }
+      });
+
+      // Save
+      $('body').on("click", "a.save-command", function(e) {
+        e.preventDefault();
+        var id = $(this).closest(".tab-pane").attr("id");
+        var editorObject = editorObjects[id];
+        $.ajax({
+          type: "POST",
+          url: "script",
+          data: {
+            "name": editorObject.name,
+            "script": editorObject.editor.getValue()
+          },
+          statusCode: {
+            400: function(xhr, status, response) {
+              // We should ensure that the response content type is json
+              var json = $.parseJSON(xhr.responseText);
+              $("#compilation-error-dialog-body").text(json.message);
+              $('#compilation-error-dialog').modal("show")
+            }
+          }
+        });
+      });
+
+      // Remove script
+      $('body').on("click", "a.remove-command", function(e) {
+        e.preventDefault();
+        var pane = $(this).closest(".tab-pane");
+        var id = pane.attr("id");
+        var editorObject = editorObjects[id];
+        editorObjects[id] = null;
+        $('a[href="#tab0"]').tab('show');
+        pane.remove();
+        $('a[href="#' + id + '"]').remove();
+        $.ajax({
+          type: "DELETE",
+          url: "script?" + $.param({"name":editorObject.name}),
+        });
+      });
 
       // Add command pop over
       $("#add-command").on("click", function(e) {
@@ -354,7 +373,7 @@
             $('#invalid-name-dialog').modal("show")
           } else {
             $('#add-command').popover('hide');
-            var tab = load(name, "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}");
+            var tab = addScript(name, "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}");
             tab.find("a").tab("show");
           }
         }
@@ -366,7 +385,7 @@
         success: function(data) {
           for (var name in data) {
             if (data.hasOwnProperty(name)) {
-              load(name, data[name]);
+              addScript(name, data[name]);
             }
           }
         }
