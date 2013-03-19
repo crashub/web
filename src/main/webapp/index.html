@@ -312,6 +312,33 @@
         });
       });
 
+      // Load function
+      var load = function(name, script) {
+        var tabId = "tab" + tabSeq++;
+        var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
+        var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
+          '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
+          "<form><textarea rows='16' cols='80'></textarea>" +
+          "</form>" +
+          "</div>");
+        $("#tab-content").append(pane);
+        $("#nav-tabs li:last").before(tab);
+        var textarea = pane.find("textarea").each(function() {
+          var editor = CodeMirror.fromTextArea(this, {
+            mode: "groovy",
+            lineNumbers: true,
+            lineWrapping: false,
+            tabindex: 2
+          });
+          editorObjects[tabId] = {
+            "name": name,
+            "editor": editor
+          };
+          editor.setValue(script);
+        });
+        return tab;
+      };
+
       // Add command pop over
       $("#add-command").on("click", function(e) {
         $("#add-command").popover("show");
@@ -326,29 +353,21 @@
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
           } else {
-            var tabId = "tab" + tabSeq++;
-            var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
-            var pane = $("<div id='" + tabId + "' class='tab-pane'>" +
-              '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right"><a class="btn" href="#"><i class="icon-save"></i></a></div></div>' +
-              "<form><textarea rows='16'' cols='80'>public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}</textarea>" +
-              "</form>" +
-              "</div>");
-            $("#tab-content").append(pane);
-            $("#nav-tabs li:last").before(tab);
-            var textarea = pane.find("textarea").each(function() {
-              var editor = CodeMirror.fromTextArea(this, {
-                mode: "groovy",
-                lineNumbers: true,
-                lineWrapping: false,
-                tabindex: 2
-              });
-              editorObjects[tabId] = {
-                "name": name,
-                "editor": editor
-              }
-            });
             $('#add-command').popover('hide');
+            var tab = load(name, "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}");
             tab.find("a").tab("show");
+          }
+        }
+      });
+
+      // Load existing scripts
+      $.ajax({
+        url: "scripts",
+        success: function(data) {
+          for (var name in data) {
+            if (data.hasOwnProperty(name)) {
+              load(name, data[name]);
+            }
           }
         }
       });

@@ -141,4 +141,20 @@ class SimpleFS implements FSDriver<String> {
     HashMap<String, Entry> entries = getEntries(true);
     entries.put(name, new Entry(text));
   }
+
+  public Iterable<String> list() {
+    HashMap<String, Entry> entries = getEntries(false);
+    return entries != null ? entries.keySet() : Collections.<String>emptyList();
+  }
+
+  public String getScript(String name) {
+    HashMap<String, Entry> entries = getEntries(false);
+    if (entries != null) {
+      Entry entry = entries.get(name);
+      if (entry != null) {
+        return entry.content;
+      }
+    }
+    return null;
+  }
 }
