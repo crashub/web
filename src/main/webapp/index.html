@@ -277,6 +277,11 @@
         }
       });
 
+      // When console tab is shown we give focus to the shell
+      $('a[href="#tab0"]').on("shown", function() {
+        $("#console").trigger("click");
+      });
+
       // Editors (model)
       var editors = {};
       var tabSeq = 1; // 0 == console
