@@ -277,7 +277,7 @@
       });
 
       // Editors (model)
-      var editorObjects = {};
+      var editors = {};
       var tabSeq = 1; // 0 == console
 
       // Script functions
@@ -295,17 +295,17 @@
         $("#tab-content").append(pane);
         $("#nav-tabs li:last").before(tab);
           var textarea = pane.find("textarea").each(function() {
-          var editor = CodeMirror.fromTextArea(this, {
+          var widget = CodeMirror.fromTextArea(this, {
             mode: "groovy",
             lineNumbers: true,
             lineWrapping: false,
             tabindex: 2
           });
-          editorObjects[tabId] = {
+          editors[tabId] = {
             "name": name,
-            "editor": editor
+            "widget": widget
           };
-          editor.setValue(script);
+          widget.setValue(script);
         });
         return tab;
       };
@@ -313,9 +313,9 @@
       // Refresh editor when tab changes
       $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
         var id = $(e.target).attr("href").substring(1);
-        var editorObject = editorObjects[id];
-        if (editorObject != null) {
-          editorObject.editor.refresh();
+        var editor = editors[id];
+        if (editor != null) {
+          editor.widget.refresh();
         }
       });
 
@@ -323,13 +323,13 @@
       $('body').on("click", "a.save-command", function(e) {
         e.preventDefault();
         var id = $(this).closest(".tab-pane").attr("id");
-        var editorObject = editorObjects[id];
+        var editor = editors[id];
         $.ajax({
           type: "POST",
           url: "script",
           data: {
-            "name": editorObject.name,
-            "script": editorObject.editor.getValue()
+            "name": editor.name,
+            "script": editor.widget.getValue()
           },
           statusCode: {
             400: function(xhr, status, response) {
@@ -347,14 +347,14 @@
         e.preventDefault();
         var pane = $(this).closest(".tab-pane");
         var id = pane.attr("id");
-        var editorObject = editorObjects[id];
-        editorObjects[id] = null;
+        var editor = editors[id];
+        editors[id] = null;
         $('a[href="#tab0"]').tab('show');
         pane.remove();
         $('a[href="#' + id + '"]').remove();
         $.ajax({
           type: "DELETE",
-          url: "script?" + $.param({"name":editorObject.name}),
+          url: "script?" + $.param({"name":editor.name}),
         });
       });
 
