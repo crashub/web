@@ -19,6 +19,8 @@
   <script type="text/javascript" src="bootstrap-tab.js"></script>
   <script type="text/javascript" src="bootstrap-tooltip.js"></script>
   <script type="text/javascript" src="bootstrap-popover.js"></script>
+  <script type="text/javascript" src="bootstrap-alert.js"></script>
+  <script type="text/javascript" src="bootstrap-modal.js"></script>
   <script type="text/javascript" src="codemirror.js"></script>
   <script type="text/javascript" src="groovy.js"></script>
   <script type="text/javascript">
@@ -302,7 +304,8 @@
             400: function(xhr, status, response) {
               // We should ensure that the response content type is json
               var json = $.parseJSON(xhr.responseText);
-              alert(json.message);
+              $("#compilation-error-dialog-body").text(json.message);
+              $('#compilation-error-dialog').modal("show")
             }
           }
         });
@@ -316,7 +319,7 @@
         } else if (e.keyCode == 13) {
           var name = $(this).val();
           if (name == null || name.length == 0) {
-            alert("Invalid name");
+            $('#invalid-name-dialog').modal("show")
           } else {
             var tabId = "tab" + tabSeq++;
             var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
@@ -408,6 +411,23 @@
 <!-- Used to determine font metric -->
 <div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
   <div class="jquery-console-message">A</div>
+</div>
+
+<div id="compilation-error-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    <div class="alert alert-error">
+      <strong>Compilation error</strong>
+    </div>
+    <pre id="compilation-error-dialog-body"></pre>
+  </div>
+</div>
+
+<div id="invalid-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    <div class="alert alert-error">
+      <strong>Invalid name</strong>
+    </div>
+  </div>
 </div>
 
 <hr>
