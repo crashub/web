@@ -297,7 +297,7 @@
         var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
         var pane = $('<div id="' + tabId + '" class="tab-pane">' +
           '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right">' +
-          '<a class="btn save-command" href="#"><i class="icon-save"></i></a>' +
+          '<a class="btn save-command disabled" href="#"><i class="icon-save"></i></a>' +
           '<a class="btn remove-command" href="#"><i class="icon-trash"></i></a>' +
           '</div></div>' +
           '<form><textarea rows="16"" cols="80"></textarea>' +
@@ -305,21 +305,21 @@
           '</div>');
         $("#tab-content").append(pane);
         $("#nav-tabs li:last").before(tab);
-          var textarea = pane.find("textarea").each(function() {
+        var textarea = pane.find("textarea").each(function() {
           var widget = CodeMirror.fromTextArea(this, {
             mode: "groovy",
             lineNumbers: true,
             lineWrapping: false,
             tabindex: 2
           });
+          widget.setValue(script);
           widget.on("change", function() {
             pane.find("a.save-command").removeClass("disabled");
           });
           editors[tabId] = {
-            "name": name,
-            "widget": widget
+            name: name,
+            widget: widget
           };
-          widget.setValue(script);
         });
         return tab;
       };
@@ -401,7 +401,6 @@
                 200: function() {
                   var tab = addScript(name, script);
                   var id = tab.find("a").tab("show").attr("href");
-                  $(id).find("a.save-command").addClass("disabled");
                   // Hack for dismissing bootstrapx-clickover
                   var event = jQuery.Event("keyup.clickery");
                   event.which = 27;
