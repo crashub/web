@@ -378,16 +378,36 @@
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 13) {
           var name = $(this).val();
+          var script = "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}";
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
           } else {
-            var tab = addScript(name, "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}");
-            tab.find("a").tab("show");
-            // Hack for dismissing bootstrapx-clickover
-            var event = jQuery.Event("keyup.clickery");
-            event.which = 27;
-            event.keyCode = 27;
-            $('#add-command').trigger(event);
+            $.ajax({
+              async: false,
+              type: "POST",
+              url: "script",
+              data: {
+                name: name,
+                script: script
+              },
+              statusCode: {
+                200: function() {
+                  var tab = addScript(name, script);
+                  tab.find("a").tab("show");
+                  // Hack for dismissing bootstrapx-clickover
+                  var event = jQuery.Event("keyup.clickery");
+                  event.which = 27;
+                  event.keyCode = 27;
+                  $('#add-command').trigger(event);
+                },
+                400: function(xhr, status, response) {
+                  // We should ensure that the response content type is json
+                  var json = $.parseJSON(xhr.responseText);
+                  $("#compilation-error-dialog-body").text(json.message);
+                  $('#compilation-error-dialog').modal("show")
+                }
+              }
+            });
           }
         }
       });
