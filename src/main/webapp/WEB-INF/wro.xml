@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro">
+  <group name='core'>
+    <js>/js/spin.min.js</js>
+    <js>/js/jquery-1.7.js</js>
+    <js>/js/jquery.console.js</js>
+    <js>/js/jquery.socket-1.0b3.js</js>
+    <js>/js/bootstrap-tab.js</js>
+    <js>/js/bootstrap-tooltip.js</js>
+    <js>/js/bootstrap-popover.js</js>
+    <js>/js/bootstrapx-clickover.js</js>
+    <js>/js/bootstrap-alert.js</js>
+    <js>/js/bootstrap-modal.js</js>
+    <js>/js/codemirror.js</js>
+    <js>/js/groovy.js</js>
+  </group>
+</groups>
