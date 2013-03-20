@@ -12,18 +12,18 @@
     <script type="text/javascript" src="less-1.3.0.min.js"></script>
   -->
 
-  <script type="text/javascript" src="spin.min.js"></script>
-  <script type="text/javascript" src="jquery-1.7.js"></script>
-  <script type="text/javascript" src="jquery.console.js"></script>
-  <script type="text/javascript" src="jquery.socket-1.0b3.js"></script>
-  <script type="text/javascript" src="bootstrap-tab.js"></script>
-  <script type="text/javascript" src="bootstrap-tooltip.js"></script>
-  <script type="text/javascript" src="bootstrap-popover.js"></script>
-  <script type="text/javascript" src="bootstrapx-clickover.js"></script>
-  <script type="text/javascript" src="bootstrap-alert.js"></script>
-  <script type="text/javascript" src="bootstrap-modal.js"></script>
-  <script type="text/javascript" src="codemirror.js"></script>
-  <script type="text/javascript" src="groovy.js"></script>
+  <script type="text/javascript" src="js/spin.min.js"></script>
+  <script type="text/javascript" src="js/jquery-1.7.js"></script>
+  <script type="text/javascript" src="js/jquery.console.js"></script>
+  <script type="text/javascript" src="js/jquery.socket-1.0b3.js"></script>
+  <script type="text/javascript" src="js/bootstrap-tab.js"></script>
+  <script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+  <script type="text/javascript" src="js/bootstrap-popover.js"></script>
+  <script type="text/javascript" src="js/bootstrapx-clickover.js"></script>
+  <script type="text/javascript" src="js/bootstrap-alert.js"></script>
+  <script type="text/javascript" src="js/bootstrap-modal.js"></script>
+  <script type="text/javascript" src="js/codemirror.js"></script>
+  <script type="text/javascript" src="js/groovy.js"></script>
   <script type="text/javascript">
   
     $(document).ready(function() {
@@ -372,7 +372,7 @@
         $('a[href="#' + id + '"]').remove();
         $.ajax({
           type: "DELETE",
-          url: "script?" + $.param({"name":editor.name}),
+          url: "script?" + $.param({"name":editor.name})
         });
       });
 
