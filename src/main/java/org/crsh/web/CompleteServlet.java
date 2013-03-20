@@ -26,7 +26,9 @@ public class CompleteServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
+    LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+    Session session = lf.getSession();
+    Shell shell = session.getShell();
     String prefix = req.getParameter("prefix");
     CompletionMatch completion = shell.complete(prefix);
     Completion completions = completion.getValue();

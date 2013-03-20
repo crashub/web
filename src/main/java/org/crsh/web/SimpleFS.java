@@ -2,8 +2,6 @@ package org.crsh.web;
 
 import org.crsh.vfs.spi.FSDriver;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +12,7 @@ import java.util.Iterator;
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 class SimpleFS implements FSDriver<String> {
 
-  private static class Entry {
+  public static class Entry {
     final String content;
     final long lastModified;
     private Entry(String content) {
@@ -24,31 +22,10 @@ class SimpleFS implements FSDriver<String> {
   }
 
   /** . */
-  final ThreadLocal<HttpServletRequest> current = new ThreadLocal<HttpServletRequest>();
+  final LifeCycle lifeCycle;
 
-  private HashMap<String, Entry> getEntries() {
-    return getEntries(false);
-  }
-
-  private HashMap<String, Entry> getEntries(boolean create) {
-    HttpServletRequest request = current.get();
-    if (request != null) {
-      HttpSession session = request.getSession(create);
-      if (session != null) {
-        HashMap<String, Entry> entries = (HashMap<String, Entry>)session.getAttribute("entries");
-        if (entries == null && create) {
-          session.setAttribute("entries", entries = new HashMap<String, Entry>());
-        }
-        return entries;
-      } else {
-        return null;
-      }
-    } else {
-      if (create) {
-        System.out.println("Cannot create entries with non existing request");
-      }
-      return null;
-    }
+  SimpleFS(LifeCycle lifeCycle) {
+    this.lifeCycle = lifeCycle;
   }
 
   public String root() throws IOException {
@@ -83,27 +60,23 @@ class SimpleFS implements FSDriver<String> {
     if ("/".equals(handle)) {
       return Collections.singletonList("user/");
     } else if ("user/".equals(handle)) {
-      final HashMap<String, Entry> entries = getEntries();
-      if (entries != null) {
-        return new Iterable<String>() {
-          public Iterator<String> iterator() {
-            return new Iterator<String>() {
-              final Iterator<String> i = entries.keySet().iterator();
-              public boolean hasNext() {
-                return i.hasNext();
-              }
-              public String next() {
-                return "user/" + i.next();
-              }
-              public void remove() {
-                throw new UnsupportedOperationException();
-              }
-            };
-          }
-        };
-      } else {
-        return Collections.emptyList();
-      }
+      final HashMap<String, Entry> entries = lifeCycle.getSession().commands;
+      return new Iterable<String>() {
+        public Iterator<String> iterator() {
+          return new Iterator<String>() {
+            final Iterator<String> i = entries.keySet().iterator();
+            public boolean hasNext() {
+              return i.hasNext();
+            }
+            public String next() {
+              return "user/" + i.next();
+            }
+            public void remove() {
+              throw new UnsupportedOperationException();
+            }
+          };
+        }
+      };
     } else {
       return Collections.emptyList();
     }
@@ -113,7 +86,7 @@ class SimpleFS implements FSDriver<String> {
     if ("/".equals(handle) || "user/".equals(handle)) {
       return 0;
     } else  {
-      HashMap<String, Entry> entries = getEntries();
+      HashMap<String, Entry> entries = lifeCycle.getSession().commands;
       Entry entry = entries.get(handle.substring("user/".length()));
       if (entry == null) {
         throw new IOException("No such entry " + handle);
@@ -125,7 +98,7 @@ class SimpleFS implements FSDriver<String> {
 
   public InputStream open(String handle) throws IOException {
     if (handle.startsWith("user/")) {
-      HashMap<String, Entry> entries = getEntries();
+      HashMap<String, Entry> entries = lifeCycle.getSession().commands;
       Entry entry = entries.get(handle.substring("user/".length()));
       if (entry == null) {
         throw new IOException("No such entry " + handle);
@@ -138,27 +111,25 @@ class SimpleFS implements FSDriver<String> {
   }
 
   public void setCommand(String name, String text) {
-    HashMap<String, Entry> entries = getEntries(true);
+    HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     entries.put(name, new Entry(text));
   }
 
   public boolean remove(String name) {
-    HashMap<String, Entry> entries = getEntries(false);
-    return entries != null && entries.remove(name) != null;
+    HashMap<String, Entry> entries = lifeCycle.getSession().commands;
+    return entries.remove(name) != null;
   }
 
   public Iterable<String> list() {
-    HashMap<String, Entry> entries = getEntries(false);
-    return entries != null ? entries.keySet() : Collections.<String>emptyList();
+    HashMap<String, Entry> entries = lifeCycle.getSession().commands;
+    return entries.keySet();
   }
 
   public String getScript(String name) {
-    HashMap<String, Entry> entries = getEntries(false);
-    if (entries != null) {
-      Entry entry = entries.get(name);
-      if (entry != null) {
-        return entry.content;
-      }
+    HashMap<String, Entry> entries = lifeCycle.getSession().commands;
+    Entry entry = entries.get(name);
+    if (entry != null) {
+      return entry.content;
     }
     return null;
   }

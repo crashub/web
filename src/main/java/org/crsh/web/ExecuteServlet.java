@@ -42,7 +42,9 @@ public class ExecuteServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    SerializableTransient<Shell> shell = (SerializableTransient<Shell>)req.getSession().getAttribute("crash");
+    LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+    Session session = lf.getSession();
+    Shell shell = session.getShell();
 
     //
     String id = req.getParameter("id");
@@ -64,7 +66,7 @@ public class ExecuteServlet extends HttpServlet {
     writer.flush();
 
     //
-    Connection conn = new Connection(this, context, shell.object, id);
+    Connection conn = new Connection(this, context, shell, id);
     connections.put(id, conn);
     context.addListener(conn);
   }

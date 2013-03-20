@@ -26,12 +26,10 @@ import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
@@ -46,34 +44,40 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
   /** . */
   private static final ConcurrentHashMap<String, LifeCycle> registry = new ConcurrentHashMap<String, LifeCycle>();
 
+  /** . */
+  private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
+
 	/** . */
 	private ShellFactory crash;
 
   /** . */
-  private final SimpleFS commands = new SimpleFS();
+  final ThreadLocal<HttpServletRequest> current = new ThreadLocal<HttpServletRequest>();
+
+  /** . */
+  private final SimpleFS commands = new SimpleFS(this);
+
+  public Session getSession() {
+    return sessions.get(current.get().getSession().getId());
+  }
 
   public void requestInitialized(ServletRequestEvent sre) {
-    commands.current.set((HttpServletRequest)sre.getServletRequest());
+    // Force session creation
+    ((HttpServletRequest)sre.getServletRequest()).getSession();
+    current.set((HttpServletRequest)sre.getServletRequest());
   }
 
   public void requestDestroyed(ServletRequestEvent sre) {
-    commands.current.remove();
+    current.remove();
   }
 
   public void sessionCreated(HttpSessionEvent se) {
-		HttpSession session = se.getSession();
-		Shell shell = crash.create(null);
-		session.setAttribute("crash", new SerializableTransient<Shell>(shell));
+    sessions.put(se.getSession().getId(), new Session(crash));
 	}
 
 	public void sessionDestroyed(HttpSessionEvent se)
 	{
-		HttpSession session = se.getSession();
-		SerializableTransient<Shell> ref = (SerializableTransient<Shell>)session.getAttribute("crash");
-		if (ref != null && ref.object != null)
-		{
-			Safe.close(ref.object);
-		}
+    Session session = sessions.remove(se.getSession().getId());
+    Safe.close(session.getShell());
 	}
 
 	public void contextInitialized(ServletContextEvent sce)
@@ -92,13 +96,7 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
 
   void removeCommand(String name) {
     commands.remove(name);
-    HttpSession session = commands.current.get().getSession(false);
-    if (session != null) {
-      HashMap<String, TimestampedObject<Class<? extends ShellCommand>>> classes = (HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>)session.getAttribute("classes");
-      if (classes != null) {
-        classes.remove(name);
-      }
-    }
+    getSession().classes.remove(name);
   }
 
   @Override
@@ -113,23 +111,11 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
           new AbstractClassManager<ShellCommand>(context, ShellCommand.class, GroovyScriptCommand.class) {
             @Override
             protected TimestampedObject<Class<? extends ShellCommand>> loadClass(String name) {
-              HttpSession session = commands.current.get().getSession(false);
-              if (session != null) {
-                HashMap<String, TimestampedObject<Class<? extends ShellCommand>>> classes = (HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>)session.getAttribute("classes");
-                if (classes != null) {
-                  return classes.get(name);
-                }
-              }
-              return null;
+              return getSession().classes.get(name);
             }
             @Override
             protected void saveClass(String name, TimestampedObject<Class<? extends ShellCommand>> clazz) {
-              HttpSession session = commands.current.get().getSession();
-              HashMap<String, TimestampedObject<Class<? extends ShellCommand>>> classes = (HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>)session.getAttribute("classes");
-              if (classes == null) {
-                session.setAttribute("classes", classes = new HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>());
-              }
-              classes.put(name, clazz);
+              getSession().classes.put(name, clazz);
             }
             @Override
             protected Resource getResource(String name) {

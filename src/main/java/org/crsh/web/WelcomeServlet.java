@@ -18,7 +18,9 @@ public class WelcomeServlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
-		Shell shell = ((SerializableTransient<Shell>)req.getSession().getAttribute("crash")).object;
+    LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+    Session session = lf.getSession();
+    Shell shell = session.getShell();
 		String welcome = shell.getWelcome();
 		String prompt = shell.getPrompt();
 		JsonObject obj = new JsonObject();
