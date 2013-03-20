@@ -312,6 +312,9 @@
             lineWrapping: false,
             tabindex: 2
           });
+          widget.on("change", function() {
+            pane.find("a.save-command").removeClass("disabled");
+          });
           editors[tabId] = {
             "name": name,
             "widget": widget
@@ -333,7 +336,8 @@
       // Save
       $('body').on("click", "a.save-command", function(e) {
         e.preventDefault();
-        var id = $(this).closest(".tab-pane").attr("id");
+        var pane = $(this).closest(".tab-pane");
+        var id = pane.attr("id");
         var editor = editors[id];
         $.ajax({
           type: "POST",
@@ -343,6 +347,9 @@
             "script": editor.widget.getValue()
           },
           statusCode: {
+            200: function() {
+              pane.find("a.save-command").addClass("disabled");
+            },
             400: function(xhr, status, response) {
               // We should ensure that the response content type is json
               var json = $.parseJSON(xhr.responseText);
@@ -393,7 +400,8 @@
               statusCode: {
                 200: function() {
                   var tab = addScript(name, script);
-                  tab.find("a").tab("show");
+                  var id = tab.find("a").tab("show").attr("href");
+                  $(id).find("a.save-command").addClass("disabled");
                   // Hack for dismissing bootstrapx-clickover
                   var event = jQuery.Event("keyup.clickery");
                   event.which = 27;
