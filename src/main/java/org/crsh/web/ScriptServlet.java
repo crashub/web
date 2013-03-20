@@ -30,8 +30,7 @@ public class ScriptServlet extends HttpServlet {
     } else {
       // Save the command
       LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-      SimpleFS commands = lf.getCommands();
-      commands.remove(name);
+      lf.removeCommand(name);
       resp.setStatus(HttpServletResponse.SC_OK);
     }
   }

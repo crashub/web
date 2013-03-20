@@ -90,6 +90,17 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     registry.put(sce.getServletContext().getContextPath(), this);
 	}
 
+  void removeCommand(String name) {
+    commands.remove(name);
+    HttpSession session = commands.current.get().getSession(false);
+    if (session != null) {
+      HashMap<String, TimestampedObject<Class<? extends ShellCommand>>> classes = (HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>)session.getAttribute("classes");
+      if (classes != null) {
+        classes.remove(name);
+      }
+    }
+  }
+
   @Override
   protected PluginDiscovery createDiscovery(ServletContext context, ClassLoader classLoader) {
     class Factory extends CRaSHPlugin<ShellFactory> implements ShellFactory {
