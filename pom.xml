@@ -278,11 +278,11 @@
           </execution>
         </executions>
       </plugin>
-        <plugin>
-          <groupId>com.cloudbees</groupId>
-          <artifactId>bees-maven-plugin</artifactId>
-          <version>1.3.2</version>
-       </plugin>
+      <plugin>
+        <groupId>com.cloudbees</groupId>
+        <artifactId>bees-maven-plugin</artifactId>
+        <version>1.3.2</version>
+      </plugin>
     </plugins>
 	</build>
 
