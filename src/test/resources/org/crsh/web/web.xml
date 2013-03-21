@@ -5,12 +5,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
   <servlet>
-    <servlet-name>ShellServlet</servlet-name>
+    <servlet-name>WelcomeServlet</servlet-name>
     <servlet-class>org.crsh.web.WelcomeServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ShellServlet</servlet-name>
+    <servlet-name>WelcomeServlet</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -110,22 +110,22 @@ class SimpleFS implements FSDriver<String> {
     }
   }
 
-  public void setCommand(String name, String text) {
+  void setScript(String name, String text) {
     HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     entries.put(name, new Entry(text));
   }
 
-  public boolean remove(String name) {
+  boolean remove(String name) {
     HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     return entries.remove(name) != null;
   }
 
-  public Iterable<String> list() {
+  Iterable<String> list() {
     HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     return entries.keySet();
   }
 
-  public String getScript(String name) {
+  String getScript(String name) {
     HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     Entry entry = entries.get(name);
     if (entry != null) {

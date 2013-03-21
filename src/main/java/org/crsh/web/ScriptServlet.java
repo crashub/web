@@ -1,7 +1,6 @@
 package org.crsh.web;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilationUnit;
@@ -80,7 +79,7 @@ public class ScriptServlet extends HttpServlet {
       // Save the command
       LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
       SimpleFS commands = lf.getCommands();
-      commands.setCommand(name, script);
+      commands.setScript(name, script);
 
       // Say ok
       resp.setStatus(200);
