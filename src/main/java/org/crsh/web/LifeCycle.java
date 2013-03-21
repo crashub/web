@@ -37,6 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener, ServletRequestListener
 {
 
+  static {
+    System.setSecurityManager(new CRaSHSecurityManager());
+  }
+
   public static LifeCycle getLifeCycle(ServletContext sc) {
     return registry.get(sc.getContextPath());
   }
