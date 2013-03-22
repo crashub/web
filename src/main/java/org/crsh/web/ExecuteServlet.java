@@ -52,7 +52,7 @@ public class ExecuteServlet extends HttpServlet {
       if (conn != null) {
         conn.process(event);
       } else {
-        System.out.println("CONNECTION NOT FOUND " + event.socket);
+        // System.out.println("CONNECTION NOT FOUND " + event.socket);
       }
     }
   }
@@ -83,7 +83,7 @@ public class ExecuteServlet extends HttpServlet {
     writer.flush();
 
     //
-    Connection conn = new Connection(this, context, shell, id);
+    Connection conn = new Connection(this, context, shell, id, req.getRemoteHost());
     connections.put(id, conn);
     context.addListener(conn);
   }

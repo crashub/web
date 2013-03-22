@@ -44,11 +44,15 @@ class Connection implements AsyncListener
   /** . */
   ProcessContext current;
 
-  Connection(ExecuteServlet servlet, AsyncContext context, Shell shell, String id) {
+  /** . */
+  final String remoteHost;
+
+  Connection(ExecuteServlet servlet, AsyncContext context, Shell shell, String id, String remoteHost) {
     this.servlet = servlet;
     this.context = context;
     this.id = id;
     this.shell = shell;
+    this.remoteHost = remoteHost;
   }
 
   void process(ExecuteServlet.Event event) {
@@ -57,7 +61,7 @@ class Connection implements AsyncListener
 
       //
       if (current != null) {
-        System.out.println("Duplicate process execution");
+        // System.out.println("Duplicate process execution");
       } else {
         // Create a shell session if needed
         if (shell == null) {
@@ -79,11 +83,11 @@ class Connection implements AsyncListener
         }
 
         // Execute process and we are done
-        current = new ProcessContext(this, line, width, height);
+        current = new ProcessContext(remoteHost, this, line, width, height);
         current.begin();
       }
     } else {
-      System.out.println("Unhandled event " + event);
+      // System.out.println("Unhandled event " + event);
     }
   }
 
@@ -92,17 +96,17 @@ class Connection implements AsyncListener
   }
 
   public void onComplete(AsyncEvent event) throws IOException {
-    System.out.println("onComplete " + id);
+    // System.out.println("onComplete " + id);
     servlet.connections.remove(id);
   }
 
   public void onTimeout(AsyncEvent event) throws IOException {
-    System.out.println("onTimeOut " + id);
+    // System.out.println("onTimeOut " + id);
     servlet.connections.remove(id);
   }
 
   public void onError(AsyncEvent event) throws IOException {
-    System.out.println("onError " + id);
+    // System.out.println("onError " + id);
     servlet.connections.remove(id);
   }
 }

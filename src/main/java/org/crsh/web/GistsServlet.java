@@ -36,6 +36,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,9 @@ public class GistsServlet extends HttpServlet {
 
   /** . */
   private static final Pattern GROOVY = Pattern.compile("(\\p{Alpha}\\p{Alnum}*)(?:\\.groovy)?", Pattern.CASE_INSENSITIVE);
+
+  /** . */
+  private static final Logger log = Logger.getLogger(GistsServlet.class.getSimpleName());
 
   /** . */
   private final LoadingCache<String, JsonObject> loader = CacheBuilder.newBuilder().maximumSize(1000)
@@ -78,8 +83,10 @@ public class GistsServlet extends HttpServlet {
       JsonObject object;
       try {
         object = loader.get(id);
+        log.info(req.getRemoteHost() + " loaded gist " + id);
       }
       catch (ExecutionException e) {
+        log.log(Level.SEVERE, req.getRemoteHost() + " could not access gist " + id, e);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getCause().getMessage());
         return;
       }
@@ -139,8 +146,10 @@ public class GistsServlet extends HttpServlet {
       if (status >= 200 && status <= 299) {
         JsonObject object= (JsonObject)new JsonParser().parse(entity);
         String id = object.getAsJsonPrimitive("id").getAsString();
+        log.log(Level.INFO, req.getRemoteHost() + " created gist " + id);
         resp.sendRedirect("/gists/" + id);
       } else {
+        log.log(Level.SEVERE, req.getRemoteHost() + " could not create gist status =" + status + " entity = " + entity);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not create gist status =" + status + " entity = " + entity);
       }
     }

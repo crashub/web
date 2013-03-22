@@ -36,16 +36,16 @@ public class CancelServlet extends HttpServlet {
       if (conn != null) {
         ProcessContext context = conn.current;
         if (context != null) {
-          System.out.println("Cancelling " + id);
+          // System.out.println("Cancelling " + id);
           context.cancel();
         } else {
-          System.out.println("No process context found for " + id + " likely already cancelled");
+          // System.out.println("No process context found for " + id + " likely already cancelled");
         }
       } else {
-        System.out.println("No connection found for " + id);
+        // System.out.println("No connection found for " + id);
       }
     } else {
-      System.out.println("Cancel without an id");
+      // System.out.println("Cancel without an id");
     }
   }
 }

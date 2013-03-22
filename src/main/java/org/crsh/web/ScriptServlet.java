@@ -30,10 +30,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebServlet(urlPatterns = "/script")
 public class ScriptServlet extends HttpServlet {
+
+  /** . */
+  private static final Logger log = Logger.getLogger(ScriptServlet.class.getSimpleName());
 
   /** . */
   static final Gson gson = new Gson();
@@ -91,6 +96,7 @@ public class ScriptServlet extends HttpServlet {
       }
 
       //
+      log.log(Level.INFO, req.getRemoteHost() + " saving script " + name + " " + script);
       System.out.println("Saving " + name);
 
       // Save the command

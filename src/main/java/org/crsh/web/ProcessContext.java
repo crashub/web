@@ -31,9 +31,14 @@ import org.crsh.util.Safe;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 class ProcessContext implements ShellProcessContext {
+
+  /** . */
+  private static final Logger log = Logger.getLogger(ProcessContext.class.getSimpleName());
 
   /** . */
   private final Connection conn;
@@ -59,7 +64,11 @@ class ProcessContext implements ShellProcessContext {
   /** . */
   private boolean useAlternate;
 
-  ProcessContext(Connection conn, String line, int width, int height) {
+  /** . */
+  private final String remoteHost;
+
+  ProcessContext(String remoteHost, Connection conn, String line, int width, int height) {
+    this.remoteHost = remoteHost;
     this.conn = conn;
     this.line = line;
     this.width = width;
@@ -100,13 +109,13 @@ class ProcessContext implements ShellProcessContext {
   }
 
   void begin() {
-    System.out.println("Executing " + line);
+    log.log(Level.INFO, remoteHost + " executing " + line);
     process = conn.shell.createProcess(line);
     process.execute(this);
   }
 
   void cancel() {
-    System.out.println("Cancelling " + line);
+    log.log(Level.INFO, remoteHost + " cancelling " + line);
     process.cancel();
   }
 
@@ -121,7 +130,7 @@ class ProcessContext implements ShellProcessContext {
 
     //
     conn.current = null;
-    System.out.println("Terminated " + line + " with " + response);
+    log.log(Level.INFO, remoteHost + " terminated " + line + " with " + response);
     try {
       conn.context.getResponse().getWriter().close();
     }
@@ -197,7 +206,7 @@ class ProcessContext implements ShellProcessContext {
       event.data(tmp);
       event.socket(conn.id);
       String data = new Gson().toJson(event);
-      System.out.println("Sending data to " + conn.id);
+      // System.out.println("Sending data to " + conn.id);
       PrintWriter writer = conn.context.getResponse().getWriter();
       for (String datum : data.split("\r\n|\r|\n")) {
         writer.print("data: ");
