@@ -71,20 +71,20 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
 	/** . */
 	private ShellFactory crash;
 
-  /** . */
-  final ThreadLocal<HttpServletRequest> current = new ThreadLocal<HttpServletRequest>();
+  /** The current session id. */
+  private final ThreadLocal<Session> current = new ThreadLocal<Session>();
 
   /** . */
   private final SimpleFS commands = new SimpleFS(this);
 
   public Session getSession() {
-    return sessions.get(current.get().getSession().getId());
+    return current.get();
   }
 
   public void requestInitialized(ServletRequestEvent sre) {
-    // Force session creation
-    ((HttpServletRequest)sre.getServletRequest()).getSession();
-    current.set((HttpServletRequest)sre.getServletRequest());
+    String id = ((HttpServletRequest)sre.getServletRequest()).getSession().getId();
+    Session session = sessions.get(id);
+    current.set(session);
   }
 
   public void requestDestroyed(ServletRequestEvent sre) {
@@ -95,11 +95,17 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     sessions.put(se.getSession().getId(), new Session(crash));
 	}
 
-	public void sessionDestroyed(HttpSessionEvent se)
-	{
-    Session session = sessions.remove(se.getSession().getId());
-    Safe.close(session.getShell());
-	}
+	public void sessionDestroyed(HttpSessionEvent se) {
+    String key = se.getSession().getId();
+    Session session = sessions.remove(key);
+    current.set(session);
+    try {
+      Safe.close(session.getShell());
+    }
+    finally {
+      current.set(null);
+    }
+  }
 
 	public void contextInitialized(ServletContextEvent sce)
 	{
