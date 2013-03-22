@@ -86,6 +86,8 @@ public class GistsServlet extends HttpServlet {
 
       //
       LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+      SimpleFS commands = lf.getCommands();
+      commands.clearScripts();
       JsonObject files = object.getAsJsonObject("files");
       for (Map.Entry<String, JsonElement> entry : files.entrySet()) {
         Matcher m = GROOVY.matcher(entry.getKey());
@@ -93,7 +95,7 @@ public class GistsServlet extends HttpServlet {
           String name = m.group(1);
           JsonObject file = (JsonObject)entry.getValue();
           String content = file.get("content").getAsString();
-          lf.getCommands().setScript(name, content);
+          commands.setScript(name, content);
         }
       }
 

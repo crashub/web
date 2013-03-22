@@ -127,6 +127,11 @@ class SimpleFS implements FSDriver<String> {
     }
   }
 
+  void clearScripts() {
+    HashMap<String, Entry> entries = lifeCycle.getSession().commands;
+    entries.clear();
+  }
+
   void setScript(String name, String text) {
     HashMap<String, Entry> entries = lifeCycle.getSession().commands;
     entries.put(name, new Entry(text));
