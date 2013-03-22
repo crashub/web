@@ -289,7 +289,7 @@
       });
       $(".twitt-shell").on("click", function(e) {
         e.preventDefault();
-        var text = "I shared JVM shell commands: " + encodeURI("" + window.location);
+        var text = "I shared JVM shell commands";
         var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
         twitter(url);
       });
