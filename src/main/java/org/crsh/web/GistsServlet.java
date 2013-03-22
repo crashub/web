@@ -17,6 +17,9 @@
 
 package org.crsh.web;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +45,24 @@ public class GistsServlet extends HttpServlet {
 
   /** . */
   private static final Pattern GROOVY = Pattern.compile("(\\p{Alpha}\\p{Alnum}*)(?:\\.groovy)?", Pattern.CASE_INSENSITIVE);
+
+  /** . */
+  private final LoadingCache<String, JsonObject> loader = CacheBuilder.newBuilder().maximumSize(1000)
+      .build(
+          new CacheLoader<String, JsonObject>() {
+            public JsonObject load(String key) throws Exception {
+              Client c = Client.create();
+              WebResource r = c.resource("https://api.github.com/gists/" + key);
+              ClientResponse response = r.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+              String entity = response.getEntity(String.class);
+              int status = response.getStatus();
+              if (status >= 200 && status <= 299) {
+                return (JsonObject)new JsonParser().parse(entity);
+              } else {
+                throw new Exception("Could not retriev gist " + key + " status=" + status + " body=" + entity);
+              }
+            }
+          });
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -53,34 +75,30 @@ public class GistsServlet extends HttpServlet {
       String id = pathInfo.substring(1);
 
       // Get gist
-      Client c = Client.create();
-      WebResource r = c.resource("https://api.github.com/gists/" + id);
-      ClientResponse response = r.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
-      String entity = response.getEntity(String.class);
+      JsonObject object;
+      try {
+        object = loader.get(id);
+      }
+      catch (ExecutionException e) {
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getCause().getMessage());
+        return;
+      }
 
       //
-      int status = response.getStatus();
-      if (status >= 200 && status <= 299) {
-        JsonObject object= (JsonObject)new JsonParser().parse(entity);
-        LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-        JsonObject files = object.getAsJsonObject("files");
-        for (Map.Entry<String, JsonElement> entry : files.entrySet()) {
-          Matcher m = GROOVY.matcher(entry.getKey());
-          if (m.matches()) {
-            String name = m.group(1);
-            JsonObject file = (JsonObject)entry.getValue();
-            String content = file.get("content").getAsString();
-            lf.getCommands().setScript(name, content);
-          }
+      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
+      JsonObject files = object.getAsJsonObject("files");
+      for (Map.Entry<String, JsonElement> entry : files.entrySet()) {
+        Matcher m = GROOVY.matcher(entry.getKey());
+        if (m.matches()) {
+          String name = m.group(1);
+          JsonObject file = (JsonObject)entry.getValue();
+          String content = file.get("content").getAsString();
+          lf.getCommands().setScript(name, content);
         }
-
-        // Display index
-        getServletContext().getRequestDispatcher("/index.html").include(req, resp);
-      } else if (status == 404) {
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "No such gist " + id);
-      } else {
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not retriev gist " + id + " status=" + status + " body=" + entity);
       }
+
+      // Display index
+      getServletContext().getRequestDispatcher("/index.html").include(req, resp);
     }
   }
 
