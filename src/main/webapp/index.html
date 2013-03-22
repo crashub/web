@@ -293,6 +293,11 @@
         var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
         twitter(url);
       });
+      $(".gplus-shell").on("click", function(e) {
+        e.preventDefault();
+        var url = "http://plus.google.com/share?url=" + encodeURI(window.location);
+        twitter(url);
+      });
 
       // Editors (model)
       var editors = {};
@@ -498,6 +503,7 @@
               <div class="btn-group btn-group-vertical" style="float:right">
                 <a class="btn" href="#" onclick="javascript:document.getElementById('save-gist').submit()" title="Save your commands as a GitHub gist"><i class="icon-upload"></i></a>
                 <a class="btn twitt-shell" href="#" title="Share your commands on Twitter"><i class="icon-twitter"></i></a>
+                <a class="btn gplus-shell" href="#" title="Share your commands on Google+"><i class="icon-google-plus"></i></a>
                 <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
               </div>
             </div>
