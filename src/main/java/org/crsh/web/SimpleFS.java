@@ -32,7 +32,7 @@ class SimpleFS implements FSDriver<String> {
   public static class Entry {
     final String content;
     final long lastModified;
-    private Entry(String content) {
+    public Entry(String content) {
       this.content = content;
       this.lastModified = System.currentTimeMillis();
     }
