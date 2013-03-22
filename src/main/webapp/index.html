@@ -292,6 +292,12 @@
         e.preventDefault();
         $(".jquery-console-inner > div:not(:last)").remove();
       });
+      $(".twitt-shell").on("click", function(e) {
+        e.preventDefault();
+        var text = "I shared JVM shell commands: " + encodeURI("" + window.location);
+        var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
+        twitter(url);
+      });
 
       // Editors (model)
       var editors = {};
@@ -492,7 +498,8 @@
             <form id="save-gist" action="/gists" method="post"></form>
             <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
-                <a class="btn" href="#" onclick="javascript:document.getElementById('save-gist').submit()"><i class="icon-save"></i></a>
+                <a class="btn" href="#" onclick="javascript:document.getElementById('save-gist').submit()"><i class="icon-upload"></i></a>
+                <a class="btn twitt-shell" href="#"><i class="icon-twitter"></i></a>
                 <a class="btn clear-shell" href="#"><i class="icon-trash"></i></a>
               </div>
             </div>

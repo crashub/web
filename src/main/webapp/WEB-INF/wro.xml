@@ -13,5 +13,6 @@
     <js>/js/bootstrap-modal.js</js>
     <js>/js/codemirror.js</js>
     <js>/js/groovy.js</js>
+    <js>/js/twitter.js</js>
   </group>
 </groups>
