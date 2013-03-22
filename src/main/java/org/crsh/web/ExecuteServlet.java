@@ -30,10 +30,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebServlet(urlPatterns = "/execute", asyncSupported = true)
 public class ExecuteServlet extends HttpServlet {
+
+  /** . */
+  private static final Logger log = Logger.getLogger(ExecuteServlet.class.getSimpleName());
 
   /** . */
   static final Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
@@ -65,27 +69,31 @@ public class ExecuteServlet extends HttpServlet {
 
     //
     String id = req.getParameter("id");
-    String transport = req.getParameter("transport");
-    AsyncContext context = req.startAsync();
-    context.setTimeout(300 * 1000L); // 5 minutes
+    if (id != null) {
+      String transport = req.getParameter("transport");
+      AsyncContext context = req.startAsync();
+      context.setTimeout(300 * 1000L); // 5 minutes
 
-    //
-    resp.setCharacterEncoding("utf-8");
-    resp.setHeader("Access-Control-Allow-Origin", "*");
-    resp.setContentType("text/" + ("sse".equals(transport) ? "event-stream" : "plain"));
+      //
+      resp.setCharacterEncoding("utf-8");
+      resp.setHeader("Access-Control-Allow-Origin", "*");
+      resp.setContentType("text/" + ("sse".equals(transport) ? "event-stream" : "plain"));
 
-    //
-    PrintWriter writer = resp.getWriter();
-    for (int i = 0; i < 2000; i++) {
-      writer.print(' ');
+      //
+      PrintWriter writer = resp.getWriter();
+      for (int i = 0; i < 2000; i++) {
+        writer.print(' ');
+      }
+      writer.print("\n");
+      writer.flush();
+
+      //
+      Connection conn = new Connection(this, context, shell, id, req.getRemoteHost());
+      connections.put(id, conn);
+      context.addListener(conn);
+    } else {
+      log.info(req.getRemoteHost() + " no connection id for request " + req.getRequestURL() + " " + req.getParameterMap());
     }
-    writer.print("\n");
-    writer.flush();
-
-    //
-    Connection conn = new Connection(this, context, shell, id, req.getRemoteHost());
-    connections.put(id, conn);
-    context.addListener(conn);
   }
 
   static class Event
