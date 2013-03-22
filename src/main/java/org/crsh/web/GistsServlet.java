@@ -115,7 +115,7 @@ public class GistsServlet extends HttpServlet {
 
       // Build body
       JsonObject body = new JsonObject();
-      body.addProperty("description", "the description for this gist");
+      body.addProperty("description", "A set of shell JVM commands for CRaSH http://try.crashub.org");
       body.addProperty("public", true);
       JsonObject files = new JsonObject();
       LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
