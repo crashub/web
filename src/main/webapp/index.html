@@ -392,7 +392,7 @@
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 13) {
           var name = $(this).val();
-          var script = "public class " + name + " {\n  @Command\n  public void main() {\n  out.println('hello');\n  }\n}";
+          var script = "public class " + name + " {\n  @Command\n  public void main() {\n    out.println('hello');\n  }\n}";
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
           } else {
