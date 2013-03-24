@@ -236,21 +236,29 @@
             welcomeMessage : data.welcome + demo,
             cols: 110,
             commandHandle: function(line, report) {
+              // Left trim
+              line = line.replace(/^\s+/,"");
+              if (line.length > 0) {
 
-              // Save report for later use (in closed event)
-              reportRef = report;
+                // Save report for later use (in closed event)
+                reportRef = report;
 
-              // Compute width
-              var metric = $("#metric").get(0);
-              var fontWidth = metric.clientWidth;
-              var fontHeight = metric.clientHeight;
-              var consoleWidth = $(".jquery-console-inner").innerWidth();
-              var consoleHeight = $(".jquery-console-inner").innerHeight();
-              var width = consoleWidth / fontWidth;
-              var height = consoleHeight / fontHeight;
+                // Compute width
+                var metric = $("#metric").get(0);
+                var fontWidth = metric.clientWidth;
+                var fontHeight = metric.clientHeight;
+                var consoleWidth = $(".jquery-console-inner").innerWidth();
+                var consoleHeight = $(".jquery-console-inner").innerHeight();
+                var width = consoleWidth / fontWidth;
+                var height = consoleHeight / fontHeight;
 
-              // Send message
+                // Send message
             	$.socket("/execute").send("message", {line: line, width: width, height: height});
+
+              } else {
+                // Don't go on server when line is empty
+                report();
+              }
             },
             cancelHandle: function() {
               if (ID != null) {
