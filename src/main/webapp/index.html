@@ -298,18 +298,22 @@
         var url = "http://plus.google.com/share?url=" + encodeURI(window.location);
         twitter(url);
       });
+      $(".save-shell").on("click", function(e) {
+        e.preventDefault();
+        document.getElementById('save-gist').submit();
+      });
 
-      // Editors (model)
-      var editors = {};
+      // State
+      var editors = {}; // The editors
       var tabSeq = 1; // 0 == console
+      var current = null; // Current tab
 
       // Script functions
       var addScript = function(name, script) {
         var tabId = "tab" + tabSeq++;
-        var tab = $('<li><a href="#' + tabId + '" data-toggle="tab">' + name + '</a></li>');
+        var tab = $('<li><a href="#' + tabId + '">' + name + '</a></li>');
         var pane = $('<div id="' + tabId + '" class="tab-pane">' +
           '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right">' +
-          '<a class="btn save-command disabled" href="#" title="Save this command"><i class="icon-save"></i></a>' +
           '<a class="btn remove-command" href="#" title="Remove this command"><i class="icon-trash"></i></a>' +
           '</div></div>' +
           '<form><textarea rows="16"" cols="80"></textarea>' +
@@ -324,52 +328,72 @@
             lineWrapping: false,
             tabindex: 2
           });
+          var editor = {
+            name: name,
+             widget: widget,
+             stale: false
+          };
           widget.setValue(script);
           widget.on("change", function() {
-            pane.find("a.save-command").removeClass("disabled");
+            editor.stale = true;
           });
-          editors[tabId] = {
-            name: name,
-            widget: widget
-          };
+          editors[tabId] = editor;
         });
         return tab;
       };
 
-      // Refresh editor when tab changes
-      $('body').on('shown', 'a[data-toggle="tab"]', function (e) {
+      // Tab navigation
+      $('#nav-tabs').on('click', 'a[href*="#tab"]', function(e) {
+        e.preventDefault();
+        var link = this;
+        var show = function() {
+          $(link).tab("show");
+        };
+        if (current != null) {
+          var id = $(current).attr("href").substring(1);
+          if (id == 'tab0') {
+            show();
+          } else {
+            var editor = editors[id];
+            var tab = this;
+            if (editor.stale) {
+              $.ajax({
+                async: false,
+                type: "POST",
+                url: "/script",
+                data: {
+                  "name": editor.name,
+                  "script": editor.widget.getValue()
+                },
+                statusCode: {
+                  200: function() {
+                    show();
+                  },
+                  400: function(xhr, status, response) {
+                    // We should ensure that the response content type is json
+                    var json = $.parseJSON(xhr.responseText);
+                    $("#compilation-error-dialog-body").text(json.message);
+                    $('#compilation-error-dialog').modal("show")
+                  }
+                }
+              });
+            } else {
+              show();
+            }
+          }
+        } else {
+          show();
+        }
+      });
+
+      // Refresh editor when tab is shown
+      $('#nav-tabs').on('shown', 'a[href*="#tab"]', function (e) {
         var id = $(e.target).attr("href").substring(1);
         var editor = editors[id];
         if (editor != null) {
           editor.widget.refresh();
         }
-      });
-
-      // Save
-      $('body').on("click", "a.save-command", function(e) {
-        e.preventDefault();
-        var pane = $(this).closest(".tab-pane");
-        var id = pane.attr("id");
-        var editor = editors[id];
-        $.ajax({
-          type: "POST",
-          url: "/script",
-          data: {
-            "name": editor.name,
-            "script": editor.widget.getValue()
-          },
-          statusCode: {
-            200: function() {
-              pane.find("a.save-command").addClass("disabled");
-            },
-            400: function(xhr, status, response) {
-              // We should ensure that the response content type is json
-              var json = $.parseJSON(xhr.responseText);
-              $("#compilation-error-dialog-body").text(json.message);
-              $('#compilation-error-dialog').modal("show")
-            }
-          }
-        });
+        current = e.target;
       });
 
       // Remove script
@@ -379,6 +403,7 @@
         var id = pane.attr("id");
         var editor = editors[id];
         editors[id] = null;
+        current = null;
         $('a[href="#tab0"]').tab('show');
         pane.remove();
         $('a[href="#' + id + '"]').remove();
@@ -485,7 +510,7 @@
     <div class="span12">
       <div class="tabbable tabs-right">
         <ul id="nav-tabs" class="nav nav-tabs">
-          <li class="active"><a href="#tab0" data-toggle="tab">Console</a></li>
+          <li class="active"><a href="#tab0">Console</a></li>
           <li style="text-align:center">
             <a
               id="add-command"
@@ -501,7 +526,7 @@
           <div class="tab-pane active" id="tab0">
             <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
-                <a class="btn" href="#" onclick="javascript:document.getElementById('save-gist').submit()" title="Save your commands as a GitHub gist"><i class="icon-upload"></i></a>
+                <a class="btn save-shell" href="#" title="Save your commands"><i class="icon-save"></i></a>
                 <a class="btn twitt-shell" href="#" title="Share your commands on Twitter"><i class="icon-twitter"></i></a>
                 <a class="btn gplus-shell" href="#" title="Share your commands on Google+"><i class="icon-google-plus"></i></a>
                 <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>

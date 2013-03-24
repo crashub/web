@@ -33,6 +33,10 @@
 
     <!-- For now skip tests -->
     <maven.test.skip>true</maven.test.skip>
+
+    <!-- Minimize javascript : default to true, can be overriden from the command line -->
+    <assets.minimize>true</assets.minimize>
+
   </properties>
 
   <developers>
@@ -295,6 +299,7 @@
             </goals>
             <configuration>
               <jsDestinationFolder>${project.build.directory}/${project.build.finalName}/js</jsDestinationFolder>
+              <minimize>${assets.minimize}</minimize>
             </configuration>
           </execution>
         </executions>
