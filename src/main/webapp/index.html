@@ -483,6 +483,12 @@
         }
       });
 
+      // Are we showing a gist ?
+      var match = window.location.pathname.match(/\/gists\/([0-9]+)/);
+      if (match) {
+        $('.github-shell').attr("href", "https://gist.github.com/" + match[1]).css("display", "block");
+      }
+
       // Load existing scripts
       $.ajax({
         url: "/scripts",
@@ -568,6 +574,7 @@
             <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
                 <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
+                <a style="display: none" class="btn github-shell" href="#" title="View gist" target="_blank"><i class="icon-github"></i></a>
               </div>
             </div>
             <div id="console" class="console"></div>
@@ -602,11 +609,11 @@
 </div>
 
 <!-- The command templates -->
-<pre id="template-hello" style="visibility:hidden">
+<pre id="template-hello" style="display:none">
 // The simplest command
 return "hello world";
 </pre>
-<pre id="template-date" style="visibility:hidden">
+<pre id="template-date" style="display:none">
 // Class based commands using annotations
 class date {
   @Usage("show the current time")
@@ -619,7 +626,7 @@ class date {
   }
 }
 </pre>
-<pre id="template-dashboard" style="visibility:hidden">
+<pre id="template-dashboard" style="display:none">
 import org.crsh.text.ui.UIBuilder;
 
 // A visual dashboard aggregating various commands with a Groovy DSL
