@@ -295,20 +295,28 @@
         e.preventDefault();
         $(".jquery-console-inner > div:not(:last)").remove();
       });
-      $(".twitt-shell").on("click", function(e) {
+
+      //
+      $("i.icon-cloud-upload").on("click", function(e) {
         e.preventDefault();
-        var text = "I shared JVM shell commands";
-        var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
-        twitter(url);
+        if ($(this).hasClass("enabled")) {
+          document.getElementById('create-gist').submit();
+        }
       });
-      $(".gplus-shell").on("click", function(e) {
+      $("i.icon-twitter").on("click", function(e) {
         e.preventDefault();
-        var url = "http://plus.google.com/share?url=" + encodeURI(window.location);
-        twitter(url);
+        if ($(this).hasClass("enabled")) {
+          var text = "I shared JVM shell commands";
+          var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
+          twitter(url);
+        }
       });
-      $(".save-shell").on("click", function(e) {
+      $("i.icon-google-plus").on("click", function(e) {
         e.preventDefault();
-        document.getElementById('save-gist').submit();
+        if ($(this).hasClass("enabled")) {
+          var url = "http://plus.google.com/share?url=" + encodeURI(window.location);
+          twitter(url);
+        }
       });
 
       // State
@@ -375,6 +383,9 @@
                 },
                 statusCode: {
                   200: function() {
+                    editor.stale = false;
+                    $("i.enabled").removeClass("enabled");
+                    $("i.icon-cloud-upload").addClass("enabled");
                     show();
                   },
                   400: function(xhr, status, response) {
@@ -419,6 +430,8 @@
           type: "DELETE",
           url: "/script?" + $.param({"name":editor.name})
         });
+        $("i.enabled").removeClass("enabled");
+        $("i.icon-cloud-upload").addClass("enabled");
       });
 
       // Add command pop over
@@ -450,6 +463,8 @@
                   var event = jQuery.Event("keyup.clickery");
                   event.which = 27;
                   event.keyCode = 27;
+                  $("i.enabled").removeClass("enabled");
+                  $("i.icon-cloud-upload").addClass("enabled");
                   $('#add-command').trigger(event);
                 },
                 400: function(xhr, status, response) {
@@ -514,6 +529,20 @@
           follow our <a href="http://blog.exoplatform.com" target="blank">developer's blog</a>!</p>
     </div>
   </div>
+  <div class="row" style="text-align: center">
+    <div class="span2 offset3">
+      <i class="icon-cloud-upload action"></i>
+      <div>Upload your commands</div>
+    </div>
+    <div class="span2">
+      <i class="icon-twitter action enabled"></i>
+      <div>Share on Twitter</div>
+    </div>
+    <div class="span2">
+      <i class="icon-google-plus action enabled"></i>
+      <div>Share on Google+</div>
+    </div>
+  </div>
   <div class="row">
     <div class="span12">
       <div class="tabbable tabs-right">
@@ -534,14 +563,11 @@
           <div class="tab-pane active" id="tab0">
             <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
-                <a class="btn save-shell" href="#" title="Save your commands"><i class="icon-save"></i></a>
-                <a class="btn twitt-shell" href="#" title="Share your commands on Twitter"><i class="icon-twitter"></i></a>
-                <a class="btn gplus-shell" href="#" title="Share your commands on Google+"><i class="icon-google-plus"></i></a>
                 <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
               </div>
             </div>
             <div id="console" class="console"></div>
-            <form id="save-gist" action="/gists" method="post"></form>
+            <form id="create-gist" action="/gists" method="post"></form>
           </div>
         </div>
       </div>

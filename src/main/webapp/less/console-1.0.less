@@ -49,3 +49,24 @@ div.console div.jquery-console-message-success {
 div.console span.jquery-console-prompt-label {
   font-weight:bold;
 }
+
+// Custom 8x
+.icon-8x {
+  font-size: 8em;
+  &.icon-border {
+    border-width: 8px;
+    .border-radius(7px);
+  }
+}
+
+i.action {
+  .opacity(30);
+  .icon-8x;
+}
+i.action.enabled {
+  .opacity(100);
+}
+i.action.enabled:hover {
+  cursor: pointer;
+}
+
