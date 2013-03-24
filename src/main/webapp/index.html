@@ -300,7 +300,7 @@
       $("i.icon-cloud-upload").on("click", function(e) {
         e.preventDefault();
         if ($(this).hasClass("enabled")) {
-          document.getElementById('create-gist').submit();
+          document.getElementById('create-gists').submit();
         }
       });
       $("i.icon-twitter").on("click", function(e) {
@@ -567,7 +567,7 @@
               </div>
             </div>
             <div id="console" class="console"></div>
-            <form id="create-gist" action="/gists" method="post"></form>
+            <form id="create-gists" action="/gists" method="post"></form>
           </div>
         </div>
       </div>
