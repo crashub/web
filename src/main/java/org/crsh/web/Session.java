@@ -47,9 +47,10 @@ class Session {
   private static final HashMap<String, SimpleFS.Entry> initial = new LinkedHashMap<String, SimpleFS.Entry>();
 
   static {
-    initial.put("hello", get("hello"));
-    initial.put("date", get("date"));
-    initial.put("dashboard", get("dashboard"));
+    // Now as templates
+//    initial.put("hello", get("hello"));
+//    initial.put("date", get("date"));
+//    initial.put("dashboard", get("dashboard"));
   }
 
   /** . */

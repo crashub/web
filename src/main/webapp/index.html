@@ -443,7 +443,11 @@
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 13) {
           var name = $(this).val();
+          var template = $("#command-template").val();
           var script = "public class " + name + " {\n  @Command\n  public void main() {\n    out.println('hello');\n  }\n}";
+          $("#template-" + template).each(function() {
+            script = $(this).html();
+          });
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
           } else {
@@ -555,7 +559,7 @@
               data-placement="bottom"
               data-html="true"
               data-trigger="manual"
-              data-content="<input id='command-name' type='text'/>"
+              data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option><option>template</option></div>"
               data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
           </li>
         </ul>
@@ -596,6 +600,98 @@
     </div>
   </div>
 </div>
+
+<!-- The command templates -->
+<pre id="template-hello" style="visibility:hidden">
+// The simplest command
+return "hello world";
+</pre>
+<pre id="template-date" style="visibility:hidden">
+// Class based commands using annotations
+class date {
+  @Usage("show the current time")
+  @Command
+  Object main(@Usage("the time format") @Option(names=["f","format"]) String format) {
+    if (format == null)
+      format = "EEE MMM d HH:mm:ss z yyyy";
+    def date = new Date();
+    return date.format(format);
+  }
+}
+</pre>
+<pre id="template-dashboard" style="visibility:hidden">
+import org.crsh.text.ui.UIBuilder;
+
+// A visual dashboard aggregating various commands with a Groovy DSL
+// for composing the dashboard
+
+def table = new UIBuilder().table(columns: [1], rows: [1,1]) {
+  header {
+    table(columns:[1]) {
+      header(bold: true, fg: black, bg: white) {
+        label("top");
+      }
+      row {
+        eval {
+          thread.ls();
+        }
+      }
+    }
+  }
+  header {
+    table(columns: [1,1,1], separator: dashed, rightCellPadding: 1) {
+      header(bold: true, fg: black, bg: white) {
+        label("props");
+        label("env");
+        label("jvm");
+      }
+      row {
+        eval {
+          execute("system propls -f java.*")
+        }
+        eval {
+          execute("env")
+        }
+        table(columns: [1,2]) {
+          row() {
+            label("Heap:")
+            eval {
+              execute("jvm heap")
+            }
+          }
+          row() {
+            label("Non heap:")
+            eval {
+              execute("jvm nonheap")
+            }
+          }
+          jvm.pools { name ->
+            row() {
+              label("$name:")
+              eval {
+                execute("jvm pool '$name'")
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+context.takeAlternateBuffer();
+try {
+  while (!Thread.interrupted()) {
+    out.cls()
+    out.show(table);
+    out.flush();
+    Thread.sleep(1000);
+  }
+}
+finally {
+  context.releaseAlternateBuffer();
+}
+</pre>
 
 </body>
 </html>
