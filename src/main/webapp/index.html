@@ -421,7 +421,7 @@
         var pane = $(this).closest(".tab-pane");
         var id = pane.attr("id");
         var editor = editors[id];
-        editors[id] = null;
+        delete editors[id];
         current = null;
         $('a[href="#tab0"]').tab('show');
         pane.remove();
@@ -431,7 +431,13 @@
           url: "/script?" + $.param({"name":editor.name})
         });
         $("i.enabled").removeClass("enabled");
-        $("i.icon-cloud-upload").addClass("enabled");
+        var count = 0;
+        for (var k in editors) {
+          if (editors.hasOwnProperty(k)) {
+            $("i.icon-cloud-upload").addClass("enabled");
+            break;
+          }
+        }
       });
 
       // Add command pop over
