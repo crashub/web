@@ -551,6 +551,12 @@
           }
         }
       });
+
+      //
+      var hash = window.location.hash;
+      if (window.location.hash) {
+        controller.promptText(hash.substring(1));
+      }
     });
   </script>
 
