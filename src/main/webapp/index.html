@@ -330,22 +330,30 @@
       var editors = {
         count: 0,
         state: {},
-        addEditor: function(name, editor) {
-          // TEST DUPLICATE HERE!!!
-          this.state[name] = editor;
+        addEditor: function(id, editor) {
+          this.state[id] = editor;
           this.count++;
         },
-        removeEditor: function(name) {
-          delete this.state[name];
+        removeEditor: function(id) {
+          delete this.state[id];
           this.count--;
         },
-        getEditor: function(name) {
-          return this.state[name];
+        getEditor: function(id) {
+          return this.state[id];
+        },
+        getEditorByName: function(name) {
+          var found;
+          this.eachEditor(function(editor) {
+            if (editor.name == name) {
+              found = editor;
+            }
+          });
+          return found;
         },
         eachEditor: function(callback) {
-          for (var k in editors) {
-            if (editors.hasOwnProperty(k)) {
-              callback(editors[k]);
+          for (var k in this.state) {
+            if (this.state.hasOwnProperty(k)) {
+              callback(this.state[k]);
             }
           }
         }
@@ -485,6 +493,8 @@
           });
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
+          } else if (editors.getEditorByName(name)) {
+            $('#duplicate-name-dialog').modal("show")
           } else {
             $.ajax({
               async: false,
@@ -636,6 +646,14 @@
       <strong>Invalid name</strong>
     </div>
   </div>
+</div>
+
+<div id="duplicate-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-body">
+        <div class="alert alert-error">
+            <strong>Command already exist</strong>
+        </div>
+    </div>
 </div>
 
 <!-- The command templates -->
