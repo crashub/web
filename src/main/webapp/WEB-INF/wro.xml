@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <groups xmlns="http://www.isdc.ro/wro">
-  <group name='core-1.0'>
+  <group name='core-1.1'>
     <js>/js/spin.min.js</js>
     <js>/js/jquery-1.7.js</js>
     <js>/js/jquery.console.js</js>

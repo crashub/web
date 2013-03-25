@@ -281,7 +281,7 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}/css</outputDirectory>
               <compress>true</compress>
               <includes>
-                <include>console-1.0.less</include>
+                <include>console-1.1.less</include>
               </includes>
             </configuration>
           </execution>
