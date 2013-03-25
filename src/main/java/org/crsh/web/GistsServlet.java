@@ -119,19 +119,16 @@ public class GistsServlet extends HttpServlet {
     if (pathInfo != null && pathInfo.length() > 0) {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No gist id must be provided");
     } else {
-
       // Build body
       JsonObject body = new JsonObject();
       body.addProperty("description", "A set of shell JVM commands for CRaSH http://try.crashub.org");
       body.addProperty("public", true);
       JsonObject files = new JsonObject();
-      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-      SimpleFS commands = lf.getCommands();
-      for (String name : commands.list()) {
-        String script = commands.getScript(name);
+      for (Map.Entry<String, String[]> parameter : req.getParameterMap().entrySet()) {
+        String script = parameter.getValue()[0];
         JsonObject file = new JsonObject();
         file.addProperty("content", script);
-        files.add(name + ".groovy", file);
+        files.add(parameter.getKey() + ".groovy", file);
       }
       body.add("files", files);
 

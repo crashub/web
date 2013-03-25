@@ -295,32 +295,61 @@
         e.preventDefault();
         $(".jquery-console-inner > div:not(:last)").remove();
       });
-
-      //
-      $("i.icon-cloud-upload").on("click", function(e) {
+      $(".upload-shell").on("click", function(e) {
         e.preventDefault();
-        if ($(this).hasClass("enabled")) {
+        if (!$(this).hasClass("disabled")) {
+          // Add scripts to the form before submitting to make them part of the post
+          editors.eachEditor(function(editor) {
+            var input = $("<input>").attr({
+              name : editor.name,
+              type : "hidden",
+              value : editor.widget.getValue()
+            });
+            $('#create-gists').append(input);
+          });
           document.getElementById('create-gists').submit();
         }
       });
-      $("i.icon-twitter").on("click", function(e) {
+      $(".twitter-shell").on("click", function(e) {
         e.preventDefault();
-        if ($(this).hasClass("enabled")) {
+        if (!$(this).hasClass("disabled")) {
           var text = "I shared JVM shell commands";
           var url = "https://twitter.com/share?via=" + encodeURI("crashub") + "&text=" + encodeURI(text);
           twitter(url);
         }
       });
-      $("i.icon-google-plus").on("click", function(e) {
+      $(".gplus-shell").on("click", function(e) {
         e.preventDefault();
-        if ($(this).hasClass("enabled")) {
+        if (!$(this).hasClass("disabled")) {
           var url = "http://plus.google.com/share?url=" + encodeURI(window.location);
           twitter(url);
         }
       });
 
       // State
-      var editors = {}; // The editors
+      var editors = {
+        count: 0,
+        state: {},
+        addEditor: function(name, editor) {
+          // TEST DUPLICATE HERE!!!
+          this.state[name] = editor;
+          this.count++;
+        },
+        removeEditor: function(name) {
+          delete this.state[name];
+          this.count--;
+        },
+        getEditor: function(name) {
+          return this.state[name];
+        },
+        eachEditor: function(callback) {
+          for (var k in editors) {
+            if (editors.hasOwnProperty(k)) {
+              callback(editors[k]);
+            }
+          }
+        }
+      };
       var tabSeq = 1; // 0 == console
       var current = null; // Current tab
 
@@ -353,7 +382,7 @@
           widget.on("change", function() {
             editor.stale = true;
           });
-          editors[tabId] = editor;
+          editors.addEditor(tabId, editor);
         });
         return tab;
       };
@@ -370,7 +399,7 @@
           if (id == 'tab0') {
             show();
           } else {
-            var editor = editors[id];
+            var editor = editors.getEditor(id);
             var tab = this;
             if (editor.stale) {
               $.ajax({
@@ -384,8 +413,9 @@
                 statusCode: {
                   200: function() {
                     editor.stale = false;
-                    $("i.enabled").removeClass("enabled");
-                    $("i.icon-cloud-upload").addClass("enabled");
+                    $(".upload-shell").removeClass("disabled");
+                    $(".twitter-shell").addClass("disabled");
+                    $(".gplus-shell").addClass("disabled");
                     show();
                   },
                   400: function(xhr, status, response) {
@@ -408,7 +438,7 @@
       // Refresh editor when tab is shown
       $('#nav-tabs').on('shown', 'a[href*="#tab"]', function (e) {
         var id = $(e.target).attr("href").substring(1);
-        var editor = editors[id];
+        var editor = editors.getEditor(id);
         if (editor != null) {
           editor.widget.refresh();
         }
@@ -420,8 +450,7 @@
         e.preventDefault();
         var pane = $(this).closest(".tab-pane");
         var id = pane.attr("id");
-        var editor = editors[id];
-        delete editors[id];
+        editors.removeEditor(id);
         current = null;
         $('a[href="#tab0"]').tab('show');
         pane.remove();
@@ -430,13 +459,12 @@
           type: "DELETE",
           url: "/script?" + $.param({"name":editor.name})
         });
-        $("i.enabled").removeClass("enabled");
+        $(".upload-shell").addClass("disabled");
+        $(".twitter-shell").addClass("disabled");
+        $(".gplus-shell").addClass("disabled");
         var count = 0;
-        for (var k in editors) {
-          if (editors.hasOwnProperty(k)) {
-            $("i.icon-cloud-upload").addClass("enabled");
-            break;
-          }
+        if (editors.count > 0) {
+          $(".upload-shell").removeClass("disabled");
         }
       });
 
@@ -473,8 +501,9 @@
                   var event = jQuery.Event("keyup.clickery");
                   event.which = 27;
                   event.keyCode = 27;
-                  $("i.enabled").removeClass("enabled");
-                  $("i.icon-cloud-upload").addClass("enabled");
+                  $(".upload-shell").removeClass("disabled");
+                  $(".twitter-shell").addClass("disabled");
+                  $(".gplus-shell").addClass("disabled");
                   $('#add-command').trigger(event);
                 },
                 400: function(xhr, status, response) {
@@ -495,13 +524,18 @@
         $('.github-shell').attr("href", "https://gist.github.com/" + match[1]).css("display", "block");
       }
 
-      // Load existing scripts
+      // Download scripts from session
       $.ajax({
         url: "/scripts",
         success: function(data) {
           for (var name in data) {
             if (data.hasOwnProperty(name)) {
               addScript(name, data[name]);
+            }
+            if (!match && editors.count > 0) {
+              $(".upload-shell").removeClass("disabled");
+              $(".twitter-shell").addClass("disabled");
+              $(".gplus-shell").addClass("disabled");
             }
           }
         }
@@ -545,20 +579,6 @@
           follow our <a href="http://blog.exoplatform.com" target="blank">developer's blog</a>!</p>
     </div>
   </div>
-  <div class="row" style="text-align: center">
-    <div class="span2 offset3">
-      <i class="icon-cloud-upload action"></i>
-      <div>Upload your commands</div>
-    </div>
-    <div class="span2">
-      <i class="icon-twitter action enabled"></i>
-      <div>Share on Twitter</div>
-    </div>
-    <div class="span2">
-      <i class="icon-google-plus action enabled"></i>
-      <div>Share on Google+</div>
-    </div>
-  </div>
   <div class="row">
     <div class="span12">
       <div class="tabbable tabs-right">
@@ -579,8 +599,11 @@
           <div class="tab-pane active" id="tab0">
             <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
-                <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
+                <a class="btn upload-shell disabled" href="#" title="Upload your commands"><i class="icon-cloud-upload"></i></a>
+                <a class="btn twitter-shell" href="#" title="Share on twitter"><i class="icon-twitter"></i></a>
+                <a class="btn gplus-shell" href="#" title="Share on Google+"><i class="icon-google-plus"></i></a>
                 <a style="display: none" class="btn github-shell" href="#" title="View gist" target="_blank"><i class="icon-github"></i></a>
+                <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
               </div>
             </div>
             <div id="console" class="console"></div>
