@@ -553,9 +553,14 @@
       });
 
       //
-      var hash = window.location.hash;
-      if (window.location.hash) {
-        controller.promptText(hash.substring(1));
+      var search = window.location.search;
+      if (search) {
+        var re = /\?(?:[^&]+&)?exec=([^($|&)]+)/;
+        match = re.exec(search);
+        if (match) {
+          var exec = decodeURI(match[1]);
+          controller.promptText(exec);
+        }
       }
     });
   </script>
