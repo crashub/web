@@ -560,6 +560,12 @@
         if (match) {
           var exec = decodeURI(match[1]);
           controller.promptText(exec);
+
+          // REAL NASTY HACK... but that works... should find something really much better
+          // because it is way more than border line
+          var press = jQuery.Event("keypress");
+          press.keyCode = 13;
+          controller.typer.data("events").keydown[0].handler(press);
         }
       }
     });
