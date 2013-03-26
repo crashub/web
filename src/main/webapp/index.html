@@ -114,20 +114,11 @@
               "\n" +
               "This CRaSH demo provides a few CRaSH features:\n" +
 
-//              "\n" +
-//              "Examples (must be created from command templates first):\n" +
-//              "% hello                                                    the hello world\n" +
-//              "% date                                                     the current date\n" +
-//              "% dashbard                                                 admin dashboard\n" +
-
-              "\n" +
-              "Threads:\n" +
+              "Examples (must be created from command templates first):\n" +
+              "% dashbard                                                 admin dashboard\n" +
               "% thread top                                               show all threads\n" +
               "% thread ls                                                list all threads\n" +
               "% thread dump X                                            dump thread X\n" +
-
-              "\n" +
-              "System:\n" +
               "% system propget java.version                              display a system property\n" +
               "% system freemem                                           display amount of free memory\n" +
 
@@ -619,7 +610,7 @@
               data-placement="bottom"
               data-html="true"
               data-trigger="manual"
-              data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option><option>dashboard</option></div>"
+              data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option></div>"
               data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
           </li>
         </ul>
@@ -689,79 +680,6 @@ class {{name}} {
     def date = new Date();
     return date.format(format);
   }
-}
-</pre>
-<pre id="template-dashboard" style="display:none">
-import org.crsh.text.ui.UIBuilder;
-
-// A visual dashboard aggregating various commands with a Groovy DSL
-// for composing the dashboard
-
-def table = new UIBuilder().table(columns: [1], rows: [1,1]) {
-  header {
-    table(columns:[1]) {
-      header(bold: true, fg: black, bg: white) {
-        label("top");
-      }
-      row {
-        eval {
-          thread.ls();
-        }
-      }
-    }
-  }
-  header {
-    table(columns: [1,1,1], separator: dashed, rightCellPadding: 1) {
-      header(bold: true, fg: black, bg: white) {
-        label("props");
-        label("env");
-        label("jvm");
-      }
-      row {
-        eval {
-          execute("system propls -f java.*")
-        }
-        eval {
-          execute("env")
-        }
-        table(columns: [1,2]) {
-          row() {
-            label("Heap:")
-            eval {
-              execute("jvm heap")
-            }
-          }
-          row() {
-            label("Non heap:")
-            eval {
-              execute("jvm nonheap")
-            }
-          }
-          jvm.pools { name ->
-            row() {
-              label("$name:")
-              eval {
-                execute("jvm pool '$name'")
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-context.takeAlternateBuffer();
-try {
-  while (!Thread.interrupted()) {
-    out.cls()
-    out.show(table);
-    out.flush();
-    Thread.sleep(1000);
-  }
-}
-finally {
-  context.releaseAlternateBuffer();
 }
 </pre>
 
