@@ -149,6 +149,7 @@
 	</build>
 
   <modules>
+    <module>gists</module>
     <module>shell</module>
   </modules>
 
