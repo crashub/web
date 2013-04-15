@@ -16,10 +16,33 @@
  */
 package org.crsh.gists;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
+@WebServlet(urlPatterns = "/*")
 public class GistsServlet extends HttpServlet {
 
+  /** . */
+  private final String clientId = System.getProperty("client-id");
 
+  /** . */
+  private final String clientSecret = System.getProperty("client-secret");
+
+  @Override
+  public void init() throws ServletException {
+  }
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    resp.setContentType("text/plain");
+    PrintWriter writer = resp.getWriter();
+    writer.print("HELLO");
+    writer.close();
+  }
 }

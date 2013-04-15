@@ -22,4 +22,8 @@
     </dependency>
   </dependencies>
 
+	<build>
+		<finalName>gists</finalName>
+  </build>
+
 </project>

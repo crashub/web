@@ -1,0 +1,8 @@
+<cloudbees-web-app>
+
+ <!-- deploy with : bees app:deploy -a vietj/gists target/gists.war -->
+   <!-- deploy with : bees app:deploy -t tomcat7 -a vietj/gists target/gists.war -->
+ <!-- test with   : bees app:run target/gists.war  -->
+
+ <appid>vietj/gists</appid>
+</cloudbees-web-app>
