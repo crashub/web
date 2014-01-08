@@ -22,16 +22,32 @@ import java.security.Permission;
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 public class CRaSHSecurityManager extends SecurityManager {
 
+  /** . */
+  private static final ThreadLocal<Boolean> enabled = new ThreadLocal<Boolean>() {
+    @Override
+    protected Boolean initialValue() {
+      return false;
+    }
+  };
+
   @Override
   public void checkPermission(Permission perm, Object context) {
     checkPermission(perm);
   }
 
+  static void runWithinContext(Runnable runnable) {
+    boolean prev = enabled.get();
+    try {
+      enabled.set(true);
+      runnable.run();
+    } finally {
+      enabled.set(prev);
+    }
+  }
+
   @Override
   public void checkPermission(Permission perm) {
-
-    // Deny access to crash. properties
-    if (perm instanceof RuntimePermission) {
+    if (perm instanceof RuntimePermission && enabled.get()) {
       RuntimePermission runtimePerm = (RuntimePermission)perm;
       String name = runtimePerm.getName();
       if (name.startsWith("exitVM.")) {

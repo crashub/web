@@ -1,7 +1,9 @@
 <cloudbees-web-app>
 
  <!-- deploy with : bees app:deploy -a vietj/crash target/crash.war -->
-   <!-- deploy with : bees app:deploy -t tomcat7 -a vietj/crash target/crash.war -->
+ <!-- deploy with : bees app:deploy -t tomcat8 -a vietj/crash target/crash.war
+                    bees app:proxy:update -a vietj/crash http_version=1.1
+                    -->
  <!-- test with   : bees app:run target/crash.war  -->
 
  <appid>vietj/crash</appid>

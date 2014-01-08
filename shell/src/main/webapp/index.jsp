@@ -21,94 +21,44 @@
 <head>
   <title></title>
 
-  <link rel="stylesheet" type="text/css" href="/css/console-1.1.css"/>
-  <link rel="stylesheet" href="/css/codemirror.css">
+  <%
+    String prefix = request.getContextPath();
+  %>
 
   <!--
-    <link rel="stylesheet/less" type="text/css" href="less/console.less"/>
-    <script type="text/javascript" src="less-1.3.0.min.js"></script>
+  <script src="js/jquery-1.7.1.min.js"></script>
+  <script src="js/jquery.mousewheel-min.js"></script>
+  <script src="js/jquery.terminal-0.7.12.js"></script>
+  <script src="js/crash.js"></script>
+  <script type="text/javascript" src="js/bootstrap-tab.js"></script>
+  <script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+  <script type="text/javascript" src="js/bootstrap-popover.js"></script>
+  <script type="text/javascript" src="js/bootstrapx-clickover.js"></script>
+  <script type="text/javascript" src="js/bootstrap-alert.js"></script>
+  <script type="text/javascript" src="js/bootstrap-modal.js"></script>
+  <script type="text/javascript" src="js/codemirror.js"></script>
+  <script type="text/javascript" src="js/groovy.js"></script>
+  <script type="text/javascript" src="js/twitter.js"></script>
   -->
+  <script type="text/javascript" src="<%= prefix %>/js/crash-1.2.js"></script>
 
-  <script type="text/javascript" src="/js/core-1.1.js"></script>
+
+  <!--
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet/less" type="text/css" href="less/console-1.1.less"/>
+    <script type="text/javascript" src="js/less-1.6.0.min.js"></script>
+    <link rel="stylesheet" href="css/jquery.terminal.css"/>
+  -->
+  <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/console-1.2.css"/>
+  <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/crash-1.2.css"/>
+
+
   <script type="text/javascript">
-  
+
     $(document).ready(function() {
 
-      // Ajax spinner
-      var opts = {
-        lines: 13, // The number of lines to draw
-        length: 7, // The length of each line
-        width: 4, // The line thickness
-        radius: 10, // The radius of the inner circle
-        rotate: 0, // The rotation offset
-        color: '#33B5E5', // #rgb or #rrggbb
-        speed: 1, // Rounds per second
-        trail: 60, // Afterglow percentage
-        shadow: false, // Whether to render a shadow
-        hwaccel: false, // Whether to use hardware acceleration
-        className: 'spinner', // The CSS class to assign to the spinner
-        zIndex: 2e9, // The z-index (defaults to 2000000000)
-        top: 'auto', // Top position relative to parent in px
-        left: 'auto' // Left position relative to parent in px
-      };
-      var target = document.getElementById('console');
-      var spinner = new Spinner(opts).spin(target);
-
-      // Spinner control
-      // spinner start with ajax request
-      // spinner stop with ajax request OR at the first message pushed by the server
-      var spinnerStart = function() {
-        t = setTimeout("showSpinner()", 100)
-      };
-      var spinnerStop = function() {
-        var tmp = t;
-        if (tmp) {
-          clearTimeout(tmp);
-        }
-        spinner.stop();
-      };
-
-      // Integrate spinner
-      var cancel;
-      window.showSpinner = function() {
-        spinner.spin(target)
-      };
-      $(document).ajaxStart(spinnerStart);
-      $(document).ajaxStop(spinnerStop);
-
-      // Utility function
-      var replLinks = function(text) {
-        var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-        return text.replace(exp,"<a href='$1' target='_blank'>$1</a>");
-      };
-
-      // Override console filledText to handle our own stuff
-      $.fn.filledText = function(txt) {
-        var buffer = [];
-        for (var i = 0;i < txt.length;i++) {
-          var c = txt.charAt(i);
-          if (c == '\r') {
-            // Ignore
-          } else if (c == '\n') {
-            buffer.push("<br/>");
-          } else if (c == ' ') {
-            buffer.push('&nbsp;')
-          } else if (c == '<') {
-            buffer.push("&lg;")
-          } else if (c == '>') {
-            buffer.push("&gt;")
-          } else {
-            buffer.push(c);
-          }
-        }
-        var html = buffer.join("");
-        html = html.replace(/ /g,'&nbsp;');
-        // html = replLinks(html);
-        $(this).html(html);
-        return this;
-      };
-
       //
+/*
       var demo =
               "\n" +
               "\n" +
@@ -124,167 +74,16 @@
 
               "\n" +
               "Type 'help' to show the available commands\n";
-
-      //
-      var ID; // The current connection id
-      var reportRef; // The report function provided by the console
-      var controller; // The controller jQuery object
-      var alternate = false; // The alternate buffer
-
-      //
-      var takeAlternate = function() {
-        if (!alternate) {
-          controller.inner.children(":not(textarea)").hide();
-          alternate = true;
-        }
-      };
-
-      //
-      var releaseAlternate = function() {
-        if (alternate) {
-          controller.inner.find(":visible:not(textarea)").remove();
-          controller.inner.children(":hidden:not(textarea)").show();
-          alternate = false;
-        }
-      };
-
-      // The function that handle messages from server
-      var message = function(data) {
-
-        // Stop spinner (if it wasn't already stopped)
-        spinnerStop();
-
-        // Find the visible jquery-console-message that is also the last child (it may be null)
-        var last = controller.inner.find(".jquery-console-message:visible:last-child");
-
-        // Use the jquery-console-message element if that's the last one
-        // otherwise create a new one
-        var container;
-        if(last.length == 0) {
-          container = $("<div class='jquery-console-message' style='display: inline'></div>");
-        } else {
-          container = last[0];
-        }
-
-        // Append
-        $(data.elements).each(function(index, value) {
-          if (value.type == 'text') {
-            var chunk = $("<span></span>").filledText(value.text);
-            if (value.fg) {
-              chunk.css('color', value.fg);
-            }
-            if (value.bg) {
-              chunk.css('background-color', value.bg);
-            }
-            $(container).append(chunk);
-          } else if (value.type == 'cls') {
-            // I don't get "find" needs to be used and "children" cannot make it work
-            controller.inner.find(":visible:not(textarea)").remove();
-          } else if (value.type == 'takeAlternate') {
-            takeAlternate();
-          } else if (value.type == 'releaseAlternate') {
-            releaseAlternate();
-          } else {
-            // ?
-          }
-        });
-
-        // Poke directly the result
-        controller.inner.append(container);
-      };
-
-      // jQuery socket
-      $.socket.defaults.transports = ["sse", "stream"];
-      $.socket.defaults.timeout = 5000;
-      // $.socket.defaults.heartbeat = 20000;
-      $.socket("/execute")
-      .message(message)
-    	.connecting(function() {
-    		console.log("connecting ...");
-    	})
-    	.open(function() {
-        ID = this.option("id");
-    		console.log("connected " + ID);
-    	})
-    	.close(function(reason) {
-    		console.log("closed " + ID + ": " + reason);
-        ID = null;
-        releaseAlternate();
-        if (reportRef != null) {
-          reportRef();
-        }
-      });
-
-      // Get welcome message
-      $.ajax({
-        url: "/welcome",
-        async: false,
-        dataType: "json",
-        success : function(data) {
-          controller = $("#console").console({
-            promptLabel: data.prompt,
-            autofocus: true,
-            welcomeMessage : data.welcome + demo,
-            cols: 110,
-            commandHandle: function(line, report) {
-              // Left trim
-              line = line.replace(/^\s+/,"");
-              if (line.length > 0) {
-
-                // Save report for later use (in closed event)
-                reportRef = report;
-
-                // Compute width
-                var metric = $("#metric").get(0);
-                var fontWidth = metric.clientWidth;
-                var fontHeight = metric.clientHeight;
-                var consoleWidth = $(".jquery-console-inner").innerWidth();
-                var consoleHeight = $(".jquery-console-inner").innerHeight();
-                var width = consoleWidth / fontWidth;
-                var height = consoleHeight / fontHeight;
-
-                // Send message
-            	$.socket("/execute").send("message", {line: line, width: width, height: height});
-
-              } else {
-                // Don't go on server when line is empty
-                report();
-              }
-            },
-            cancelHandle: function() {
-              if (ID != null) {
-                console.log("cancelling " + ID);
-                $.ajax({
-                  url: "/cancel",
-                  data: {id: ID}
-                });
-              }
-            },
-            completeHandle: function(prefix) {
-              var ret = [];
-              $.ajax({
-                url: "/complete",
-                dataType: "json",
-                async: false,
-                data: $.param({prefix: prefix}),
-                success: function(data) {
-                  ret = data;
-                }
-              });
-              return ret;
-            }
-          });
-        }
-      });
+*/
 
       // When console tab is shown we give focus to the shell
       $('a[href="#tab0"]').on("shown", function() {
-        $("#console").trigger("click");
+        // $("#console").trigger("click");
       });
       // Clear the shell (except the last div that is the prompt box)
       $(".clear-shell").on("click", function(e) {
-        e.preventDefault();
-        $(".jquery-console-inner > div:not(:last)").remove();
+        // e.preventDefault();
+        // $(".jquery-console-inner > div:not(:last)").remove();
       });
       $(".upload-shell").on("click", function(e) {
         e.preventDefault();
@@ -404,7 +203,7 @@
               $.ajax({
                 async: false,
                 type: "POST",
-                url: "/script",
+                url: "<%= prefix %>/script",
                 data: {
                   "name": editor.name,
                   "script": editor.widget.getValue()
@@ -456,7 +255,7 @@
         $('a[href="#' + id + '"]').remove();
         $.ajax({
           type: "DELETE",
-          url: "/script?" + $.param({"name":editor.name})
+          url: "<%= prefix %>/script?" + $.param({"name":editor.name})
         });
         $(".upload-shell").addClass("disabled");
         $(".twitter-shell").addClass("disabled");
@@ -490,7 +289,7 @@
             $.ajax({
               async: false,
               type: "POST",
-              url: "/script",
+              url: "<%= prefix %>/script",
               data: {
                 name: name,
                 script: script
@@ -528,7 +327,7 @@
 
       // Download scripts from session
       $.ajax({
-        url: "/scripts",
+        url: "<%= prefix %>/scripts",
         success: function(data) {
           for (var name in data) {
             if (data.hasOwnProperty(name)) {
@@ -562,6 +361,25 @@
     });
   </script>
 
+  <script type="text/javascript">
+
+      //
+      $(function() {
+          // Create web socket url
+          var protocol;
+          if (window.location.protocol == 'http:') {
+              protocol = 'ws';
+          } else {
+              protocol = 'wss';
+          }
+          var url = protocol + '://' + window.location.host + "<%= prefix %>" + '/crash';
+          var crash = new CRaSH($('#console'), 960, 600);
+          crash.connect(url);
+      });
+
+  </script>
+
+
   <!-- Google Analytics -->
   <script type="text/javascript">
 
@@ -576,7 +394,6 @@
     })();
 
   </script>
-
 </head>
 <body>
 
@@ -585,7 +402,7 @@
     <div class="container">
       <ul id="tabs" class="nav">
         <li><a href="http://www.crashub.org" target="blank">Crashub</a></li>
-        <li><a href="http://www.crashub.org/reference.html#d5e493" target="blank">Documentation</a></li>
+        <li><a href="http://www.crashub.org/beta/reference.html" target="blank">Documentation</a></li>
       </ul>
     </div>
   </div>
@@ -616,7 +433,7 @@
         </ul>
         <div id="tab-content" class="tab-content">
           <div class="tab-pane active" id="tab0">
-            <div class="btn-toolbar">
+              <div class="btn-toolbar">
               <div class="btn-group btn-group-vertical" style="float:right">
                 <a class="btn upload-shell disabled" href="#" title="Upload your commands"><i class="icon-cloud-upload"></i></a>
                 <a class="btn twitter-shell" href="#" title="Share on twitter"><i class="icon-twitter"></i></a>
@@ -625,8 +442,8 @@
                 <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
               </div>
             </div>
-            <div id="console" class="console"></div>
-            <form id="create-gists" action="/gists" method="post"></form>
+            <div id="console"></div>
+            <form id="create-gists" action="gists" method="post"></form>
           </div>
         </div>
       </div>

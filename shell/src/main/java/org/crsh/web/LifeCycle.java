@@ -17,46 +17,37 @@
 
 package org.crsh.web;
 
-import org.crsh.command.GroovyScript;
-import org.crsh.command.GroovyScriptCommand;
-import org.crsh.command.ShellCommand;
 import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.plugin.PluginContext;
 import org.crsh.plugin.PluginDiscovery;
-import org.crsh.plugin.ResourceKind;
 import org.crsh.plugin.SimplePluginDiscovery;
 import org.crsh.plugin.WebPluginLifeCycle;
 import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
-import org.crsh.shell.impl.command.AbstractClassManager;
+import org.crsh.shell.impl.async.AsyncShell;
 import org.crsh.shell.impl.command.CRaSH;
-import org.crsh.shell.impl.command.ClassManager;
+import org.crsh.shell.impl.command.CRaSHSession;
 import org.crsh.util.Safe;
-import org.crsh.util.TimestampedObject;
+import org.crsh.util.ServletContextMap;
 import org.crsh.vfs.FS;
 import org.crsh.vfs.Path;
-import org.crsh.vfs.Resource;
+import org.crsh.web.servlet.CRaSHConnector;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.security.Permission;
 import java.security.Principal;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebListener
-public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener, ServletRequestListener
+public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
 {
-
-  static {
-    System.setSecurityManager(new CRaSHSecurityManager());
-  }
 
   public static LifeCycle getLifeCycle(ServletContext sc) {
     return registry.get(sc.getContextPath());
@@ -66,38 +57,32 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
   private static final ConcurrentHashMap<String, LifeCycle> registry = new ConcurrentHashMap<String, LifeCycle>();
 
   /** . */
-  private final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
+  final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
 	/** . */
-	private ShellFactory crash;
+	ShellFactory crash;
 
-  /** The current session id. */
-  private final ThreadLocal<Session> current = new ThreadLocal<Session>();
+  /** The current session. */
+  final ThreadLocal<Session> current = new ThreadLocal<Session>();
 
   /** . */
   private final SimpleFS commands = new SimpleFS(this);
 
   public Session getSession() {
-    return current.get();
-  }
-
-  public void requestInitialized(ServletRequestEvent sre) {
-    String id = ((HttpServletRequest)sre.getServletRequest()).getSession().getId();
-    Session session = sessions.get(id);
-    current.set(session);
-  }
-
-  public void requestDestroyed(ServletRequestEvent sre) {
-    current.remove();
+    Session session = current.get();
+    if (session == null) {
+      // Special case : need to handle it better
+      String id = CRaSHConnector.getHttpSessionId();
+      session = sessions.get(id);
+    }
+    return session;
   }
 
   public void sessionCreated(HttpSessionEvent se) {
-    sessions.put(se.getSession().getId(), new Session(crash));
-	}
+  }
 
-	public void sessionDestroyed(HttpSessionEvent se) {
-    String key = se.getSession().getId();
-    Session session = sessions.remove(key);
+  public void sessionDestroyed(HttpSessionEvent se) {
+    Session session = sessions.remove((String)se.getSession().getAttribute("CRASHID"));
     current.set(session);
     try {
       Safe.close(session.getShell());
@@ -112,13 +97,20 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     super.contextInitialized(sce);
 
     //
-    PluginContext context = getPluginContext(sce.getServletContext());
+    PluginContext context = getPluginContext(sce.getServletContext().getContextPath());
 
     //
     crash = context.getPlugin(ShellFactory.class);
 
     //
     registry.put(sce.getServletContext().getContextPath(), this);
+
+    // Preload all the classes used by the security manager to avoid ClassCircularityError...
+    Class a = RuntimePermission.class;
+    Class b = Permission.class;
+    Class c = SecurityManager.class;
+    Class d = SecurityException.class;
+    System.setSecurityManager(new CRaSHSecurityManager());
 	}
 
   void removeCommand(String name) {
@@ -127,40 +119,38 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
   }
 
   @Override
+  protected PluginContext createPluginContext(ServletContext context, FS cmdFS, FS confFS, PluginDiscovery discovery) {
+    return new PluginContext(
+        new ContextualExecutorService(this, 20),
+        new ScheduledThreadPoolExecutor(1),
+        discovery,
+        new ServletContextMap(context),
+        cmdFS,
+        confFS,
+        context.getClassLoader());
+  }
+
+  @Override
   protected PluginDiscovery createDiscovery(ServletContext context, ClassLoader classLoader) {
     class Factory extends CRaSHPlugin<ShellFactory> implements ShellFactory {
-      private CRaSH crash;
-      @Override
-      public void init() {
-        final PluginContext context = getContext();
-        crash = new CRaSH(
-          context,
-          new AbstractClassManager<ShellCommand>(context, ShellCommand.class, GroovyScriptCommand.class) {
-            @Override
-            protected TimestampedObject<Class<? extends ShellCommand>> loadClass(String name) {
-              return getSession().classes.get(name);
-            }
-            @Override
-            protected void saveClass(String name, TimestampedObject<Class<? extends ShellCommand>> clazz) {
-              getSession().classes.put(name, clazz);
-            }
-            @Override
-            protected Resource getResource(String name) {
-              return context.loadResource(name, ResourceKind.COMMAND);
-            }
-          },
-          new ClassManager<GroovyScript>(context, ResourceKind.LIFECYCLE, GroovyScript.class, GroovyScript.class));
-      }
       @Override
       public ShellFactory getImplementation() {
         return this;
       }
       public Shell create(Principal principal) {
-        return crash.createSession(principal);
+        PluginContext context = getContext();
+        CRaSH crash = new CRaSH(context);
+        CRaSHSession session = crash.createSession(principal);
+        return new AsyncShell(getContext().getExecutor(), session);
       }
     }
     SimplePluginDiscovery discovery = new SimplePluginDiscovery();
     discovery.add(new Factory());
+    for (CRaSHPlugin<?> plugin : super.createDiscovery(context, classLoader).getPlugins()) {
+      if (!plugin.getType().isAssignableFrom(ShellFactory.class)) {
+        discovery.add(plugin);
+      }
+    }
     return discovery;
   }
 

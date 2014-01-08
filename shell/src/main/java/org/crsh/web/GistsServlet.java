@@ -76,6 +76,7 @@ public class GistsServlet extends HttpServlet {
     if (pathInfo == null || pathInfo.length() < 2) {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No gist id provided");
     } else {
+
       // Remove /
       String id = pathInfo.substring(1);
 
@@ -107,7 +108,7 @@ public class GistsServlet extends HttpServlet {
       }
 
       // Display index
-      getServletContext().getRequestDispatcher("/index.html").include(req, resp);
+      getServletContext().getRequestDispatcher("/index.jsp").include(req, resp);
     }
   }
 
@@ -144,7 +145,7 @@ public class GistsServlet extends HttpServlet {
         JsonObject object= (JsonObject)new JsonParser().parse(entity);
         String id = object.getAsJsonPrimitive("id").getAsString();
         log.log(Level.INFO, req.getRemoteHost() + " created gist " + id);
-        resp.sendRedirect("/gists/" + id);
+        resp.sendRedirect(req.getContextPath() + "/gists/" + id);
       } else {
         log.log(Level.SEVERE, req.getRemoteHost() + " could not create gist status =" + status + " entity = " + entity);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Could not create gist status =" + status + " entity = " + entity);

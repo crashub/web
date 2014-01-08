@@ -97,7 +97,6 @@ public class ScriptServlet extends HttpServlet {
 
       //
       log.log(Level.INFO, req.getRemoteHost() + " saving script " + name + " " + script);
-      System.out.println("Saving " + name);
 
       // Save the command
       LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());

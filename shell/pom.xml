@@ -23,9 +23,14 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.crsh</groupId>
-      <artifactId>crsh.shell.core</artifactId>
-      <version>1.2.8</version>
+      <groupId>org.crashub</groupId>
+      <artifactId>crash.shell</artifactId>
+      <version>1.3.0-beta13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.crashub</groupId>
+      <artifactId>crash.connectors.web</artifactId>
+      <version>1.3.0-beta13</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -45,7 +50,7 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>1.17.1</version>
+      <version>1.18</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -129,6 +134,17 @@
 
 	<build>
 		<finalName>crash</finalName>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>9.1.0.v20131115</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -138,13 +154,14 @@
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
-    
+
       <plugin>
         <groupId>org.lesscss</groupId>
         <artifactId>lesscss-maven-plugin</artifactId>
         <version>1.3.3</version>
         <executions>
           <execution>
+            <phase>generate-resources</phase>
             <goals>
               <goal>compile</goal>
             </goals>
@@ -153,7 +170,7 @@
               <outputDirectory>${project.build.directory}/${project.build.finalName}/css</outputDirectory>
               <compress>true</compress>
               <includes>
-                <include>console-1.1.less</include>
+                <include>console-1.2.less</include>
               </includes>
             </configuration>
           </execution>
@@ -162,20 +179,22 @@
       <plugin>
         <groupId>ro.isdc.wro4j</groupId>
         <artifactId>wro4j-maven-plugin</artifactId>
-        <version>1.6.3</version>
+        <version>1.7.2</version>
         <executions>
           <execution>
-            <phase>compile</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <jsDestinationFolder>${project.build.directory}/${project.build.finalName}/js</jsDestinationFolder>
+              <cssDestinationFolder>${project.build.directory}/${project.build.finalName}/css</cssDestinationFolder>
               <minimize>${assets.minimize}</minimize>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>com.cloudbees</groupId>
         <artifactId>bees-maven-plugin</artifactId>
