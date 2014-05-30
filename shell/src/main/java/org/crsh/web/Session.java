@@ -17,11 +17,11 @@
 
 package org.crsh.web;
 
-import org.crsh.command.ShellCommand;
 import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
-import org.crsh.util.IO;
+import org.crsh.shell.impl.command.spi.Command;
 import org.crsh.util.TimestampedObject;
+import org.crsh.util.Utils;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ class Session {
   private static SimpleFS.Entry get(String name) {
     InputStream in = Session.class.getResourceAsStream(name + ".groovy");
     if (in != null) {
-      return new SimpleFS.Entry(IO.readAsUTF8(in));
+      return new SimpleFS.Entry(Utils.readAsUTF8(in));
     } else {
       return new SimpleFS.Entry("// Could not retrieve command : " + name);
     }
@@ -60,14 +60,14 @@ class Session {
   private final ShellFactory factory;
 
   /** . */
-  final HashMap<String, TimestampedObject<Class<? extends ShellCommand>>> classes;
+  final HashMap<String, TimestampedObject<Class<? extends Command<?>>>> classes;
 
   /** . */
   final HashMap<String, SimpleFS.Entry> commands;
 
   Session(ShellFactory factory) {
     this.factory = factory;
-    this.classes = new HashMap<String, TimestampedObject<Class<? extends ShellCommand>>>();
+    this.classes = new HashMap<String, TimestampedObject<Class<? extends Command<?>>>>();
     this.commands = new LinkedHashMap<String, SimpleFS.Entry>(initial);
   }
 

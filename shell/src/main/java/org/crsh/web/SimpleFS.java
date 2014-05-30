@@ -47,7 +47,27 @@ class SimpleFS implements FSDriver<String> {
   }
 
   private Map<String, Entry> getCommands() {
-    Session session = lifeCycle.getSession();
+    Session session = null;
+    try {
+      session = lifeCycle.getSession();
+    }
+    catch (NullPointerException e) {
+      // Workaround for initialization bug
+      // 30-May-2014 21:37:46.191 SEVERE [localhost-startStop-1] org.apache.catalina.core.StandardContext.listenerStart Exception sending context initialized event to listener instance of class org.crsh.web.LifeCycle
+      // java.lang.NullPointerException
+      //   at org.crsh.web.servlet.CRaSHConnector.getHttpSessionId(CRaSHConnector.java:64)
+      //   at org.crsh.web.LifeCycle.getSession(LifeCycle.java:68)
+      //   at org.crsh.web.SimpleFS.getCommands(SimpleFS.java:50)
+      //   at org.crsh.web.SimpleFS.children(SimpleFS.java:86)
+      //   at org.crsh.web.SimpleFS.children(SimpleFS.java:31)
+      //   at org.crsh.vfs.Handle.children(Handle.java:54)
+      //   at org.crsh.vfs.File.children(File.java:100)
+      //   at org.crsh.plugin.ResourceManager.refresh(ResourceManager.java:156)
+      //   at org.crsh.plugin.PluginContext.refresh(PluginContext.java:321)
+      //   at org.crsh.plugin.Embedded.start(Embedded.java:67)
+      //   at org.crsh.plugin.WebPluginLifeCycle.contextInitialized(WebPluginLifeCycle.java:116)
+      //   at org.crsh.web.LifeCycle.contextInitialized(LifeCycle.java:90)
+    }
     return session != null ? session.commands : Collections.<String, Entry>emptyMap();
   }
 
