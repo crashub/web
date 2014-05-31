@@ -89,7 +89,9 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     if (session == null) {
       // Special case : need to handle it better
       String id = CRaSHConnector.getHttpSessionId();
-      session = sessions.get(id);
+      if (id != null) {
+        session = sessions.get(id);
+      }
     }
     return session;
   }
