@@ -78,7 +78,7 @@
 
       // When console tab is shown we give focus to the shell
       $('a[href="#tab0"]').on("shown", function() {
-        // $("#console").trigger("click");
+        $("#console").trigger("click");
       });
       // Clear the shell (except the last div that is the prompt box)
       $(".clear-shell").on("click", function(e) {
@@ -250,7 +250,7 @@
         e.preventDefault();
         var pane = $(this).closest(".tab-pane");
         var id = pane.attr("id");
-        editors.removeEditor(id);
+        var editor = editors.removeEditor(id);
         current = null;
         $('a[href="#tab0"]').tab('show');
         pane.remove();
@@ -272,6 +272,8 @@
       $("#add-command").clickover({
           onShown: function() {
             $("#command-name").focus();
+            crash.pause();
+            console.debug(document.activeElement)
         }
       });
       $("body").on("keyup", "#command-name", function(e) {
@@ -308,6 +310,7 @@
                   $(".twitter-shell").addClass("disabled");
                   $(".gplus-shell").addClass("disabled");
                   $('#add-command').trigger(event);
+                  crash.resume()
                 },
                 400: function(xhr, status, response) {
                   // We should ensure that the response content type is json
@@ -375,7 +378,9 @@
               protocol = 'wss';
           }
           var url = protocol + '://' + window.location.host + "<%= prefix %>" + '/crash';
-          var crash = new CRaSH($('#console'), 960, 600);
+
+          // Set top level crash on purpose
+          crash = new CRaSH($('#console'), 960, 600);
           crash.connect(url);
       });
 
