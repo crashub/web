@@ -26,6 +26,7 @@ import com.google.gson.JsonParser;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.codehaus.groovy.control.CompilationFailedException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -92,10 +93,11 @@ public class GistsServlet extends HttpServlet {
         return;
       }
 
-      //
-      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-      SimpleFS commands = lf.getCommands();
-      commands.clearScripts();
+      // Clear all scripts
+      Session session = LifeCycle.getSession();
+      session.clearScripts();
+
+      // Set all incoming scripts
       JsonObject files = object.getAsJsonObject("files");
       for (Map.Entry<String, JsonElement> entry : files.entrySet()) {
         Matcher m = GROOVY.matcher(entry.getKey());
@@ -103,7 +105,12 @@ public class GistsServlet extends HttpServlet {
           String name = m.group(1);
           JsonObject file = (JsonObject)entry.getValue();
           String content = file.get("content").getAsString();
-          commands.setScript(name, content);
+          try {
+            session.setScript(name, content);
+          }
+          catch (CompilationFailedException e) {
+            log.log(Level.SEVERE, "Invalid command " + name + " " + content, e);
+          }
         }
       }
 

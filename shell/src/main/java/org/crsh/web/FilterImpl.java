@@ -46,9 +46,6 @@ public class FilterImpl implements Filter {
   public void doFilter(ServletRequest servletReq, ServletResponse servletResp, FilterChain chain) throws IOException, ServletException {
 
     //
-    LifeCycle lifeCycle = LifeCycle.getLifeCycle(config.getServletContext());
-
-    //
     HttpServletRequest req = (HttpServletRequest)servletReq;
     HttpServletResponse resp = (HttpServletResponse)servletResp;
 
@@ -79,14 +76,17 @@ public class FilterImpl implements Filter {
     }
 
     //
-    Session session = lifeCycle.sessions.get(sessionId);
+    LifeCycle lifeCycle = LifeCycle.getLifeCycle(config.getServletContext());
+
+    //
+    Session session = LifeCycle.sessions.get(sessionId);
     if (session == null) {
       session = new Session(lifeCycle.crash);
-      lifeCycle.sessions.put(sessionId, session);
+      LifeCycle.sessions.put(sessionId, session);
     }
 
     //
-    lifeCycle.current.set(session);
+    LifeCycle.current.set(session);
 
     //
     try {

@@ -17,10 +17,15 @@
 
 package org.crsh.web;
 
+import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.plugin.PluginContext;
 import org.crsh.plugin.PluginDiscovery;
+import org.crsh.plugin.SimplePluginDiscovery;
 import org.crsh.plugin.WebPluginLifeCycle;
+import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
+import org.crsh.shell.impl.async.AsyncShell;
+import org.crsh.shell.impl.command.CRaSH;
 import org.crsh.util.Utils;
 import org.crsh.vfs.FS;
 import org.crsh.vfs.Path;
@@ -34,6 +39,7 @@ import javax.servlet.http.HttpSessionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.Permission;
+import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -42,17 +48,16 @@ import java.util.logging.LogManager;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebListener
-public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
-{
+public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener {
 
   /** . */
   static final String log_config =
       // Logging
       "handlers = java.util.logging.ConsoleHandler\n" +
-      // Console Logging
-      "java.util.logging.ConsoleHandler.level = ALL\n" +
-      // Default global logging level
-      ".level=ALL\n";
+          // Console Logging
+          "java.util.logging.ConsoleHandler.level = ALL\n" +
+          // Default global logging level
+          ".level=ALL\n";
 
   static {
     // Configure logging
@@ -73,18 +78,15 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
   private static final ConcurrentHashMap<String, LifeCycle> registry = new ConcurrentHashMap<String, LifeCycle>();
 
   /** . */
-  final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
-
-	/** . */
-	ShellFactory crash;
-
-  /** The current session. */
-  final ThreadLocal<Session> current = new ThreadLocal<Session>();
+  static final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
   /** . */
-  private final SimpleFS commands = new SimpleFS(this);
+  ShellFactory crash;
 
-  public Session getSession() {
+  /** The current session. */
+  static final ThreadLocal<Session> current = new ThreadLocal<Session>();
+
+  public static Session getSession() {
     Session session = current.get();
     if (session == null) {
       // Special case : need to handle it better
@@ -110,8 +112,7 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     }
   }
 
-	public void contextInitialized(ServletContextEvent sce)
-	{
+  public void contextInitialized(ServletContextEvent sce) {
     super.contextInitialized(sce);
 
     //
@@ -129,11 +130,30 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     Class c = SecurityManager.class;
     Class d = SecurityException.class;
     System.setSecurityManager(new CRaSHSecurityManager());
-	}
+  }
 
-  void removeCommand(String name) {
-    commands.remove(name);
-    getSession().classes.remove(name);
+  @Override
+  protected PluginDiscovery createDiscovery(ServletContext context, ClassLoader classLoader) {
+    class Factory extends CRaSHPlugin<ShellFactory> implements ShellFactory {
+      @Override
+      public ShellFactory getImplementation() {
+        return this;
+      }
+      public Shell create(Principal principal) {
+        PluginContext context = getContext();
+        CRaSH crash = new CRaSH(context);
+        Shell session = crash.createSession(principal);
+        return new AsyncShell(getContext().getExecutor(), session);
+      }
+    }
+    SimplePluginDiscovery discovery = new SimplePluginDiscovery();
+    discovery.add(new Factory());
+    for (CRaSHPlugin<?> plugin : super.createDiscovery(context, classLoader).getPlugins()) {
+      if (!plugin.getType().isAssignableFrom(ShellFactory.class)) {
+        discovery.add(plugin);
+      }
+    }
+    return discovery;
   }
 
   @Override
@@ -143,7 +163,6 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     try {
       cmdFS = new FS();
       cmdFS.mount(Thread.currentThread().getContextClassLoader(), Path.get("/crash/commands/"));
-      cmdFS.mount(commands);
       confFS = new FS();
       confFS.mount(Thread.currentThread().getContextClassLoader(), Path.get("/crash/"));
     }
@@ -171,8 +190,7 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
     return "classpath:/crash/";
   }
 
-  public void contextDestroyed(ServletContextEvent sce)
-	{
+  public void contextDestroyed(ServletContextEvent sce) {
     registry.remove(sce.getServletContext().getContextPath());
 
     //
@@ -182,9 +200,5 @@ public class LifeCycle extends WebPluginLifeCycle implements HttpSessionListener
 
     //
     super.contextDestroyed(sce);
-	}
-
-  public SimpleFS getCommands() {
-    return commands;
   }
 }

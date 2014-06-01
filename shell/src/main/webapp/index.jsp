@@ -45,7 +45,7 @@
 
   <!--
     <link rel="stylesheet" href="css/codemirror.css">
-    <link rel="stylesheet/less" type="text/css" href="less/console-1.1.less"/>
+    <link rel="stylesheet/less" type="text/css" href="less/console-1.2.less"/>
     <script type="text/javascript" src="js/less-1.6.0.min.js"></script>
     <link rel="stylesheet" href="css/jquery.terminal.css"/>
   -->
@@ -125,8 +125,10 @@
           this.count++;
         },
         removeEditor: function(id) {
+          var editor = this.state[id];
           delete this.state[id];
           this.count--;
+          return editor;
         },
         getEditor: function(id) {
           return this.state[id];

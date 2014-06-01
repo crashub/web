@@ -17,15 +17,18 @@
 
 package org.crsh.web;
 
+import groovy.lang.GroovyClassLoader;
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.crsh.lang.impl.groovy.command.GroovyScriptCommand;
 import org.crsh.shell.Shell;
 import org.crsh.shell.ShellFactory;
 import org.crsh.shell.impl.command.spi.Command;
-import org.crsh.util.TimestampedObject;
-import org.crsh.util.Utils;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Our session.
@@ -34,17 +37,10 @@ import java.util.LinkedHashMap;
  */
 class Session {
 
-  private static SimpleFS.Entry get(String name) {
-    InputStream in = Session.class.getResourceAsStream(name + ".groovy");
-    if (in != null) {
-      return new SimpleFS.Entry(Utils.readAsUTF8(in));
-    } else {
-      return new SimpleFS.Entry("// Could not retrieve command : " + name);
-    }
-  }
+  private static final Logger log = Logger.getLogger(Session.class.getSimpleName());
 
   /** Initial commands. */
-  private static final HashMap<String, SimpleFS.Entry> initial = new LinkedHashMap<String, SimpleFS.Entry>();
+  private static final HashMap<String, Script> initial = new LinkedHashMap<String, Script>();
 
   static {
     // Now as templates
@@ -60,15 +56,11 @@ class Session {
   private final ShellFactory factory;
 
   /** . */
-  final HashMap<String, TimestampedObject<Class<? extends Command<?>>>> classes;
-
-  /** . */
-  final HashMap<String, SimpleFS.Entry> commands;
+  final HashMap<String, Script> commands;
 
   Session(ShellFactory factory) {
     this.factory = factory;
-    this.classes = new HashMap<String, TimestampedObject<Class<? extends Command<?>>>>();
-    this.commands = new LinkedHashMap<String, SimpleFS.Entry>(initial);
+    this.commands = new LinkedHashMap<String, Script>(initial);
   }
 
   /** . */
@@ -77,5 +69,38 @@ class Session {
       shell = factory.create(null);
     }
     return shell;
+  }
+
+  void clearScripts() {
+    Session session = LifeCycle.getSession();
+    session.commands.clear();
+  }
+
+  void removeScript(String name) {
+    commands.remove(name);
+  }
+
+  void setScript(String scriptName, String scriptText) throws CompilationFailedException {
+
+    // Check syntax errors and determine the name of the class
+    CompilerConfiguration config = new CompilerConfiguration();
+    config.setRecompileGroovySource(true);
+    config.setScriptBaseClass(GroovyScriptCommand.class.getName());
+    GroovyClassLoader gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), config);
+
+    //
+    Class<? extends Command<?>> clazz = gcl.parseClass(scriptText);
+
+    //
+    if (scriptName == null || scriptName.length() == 0) {
+      scriptName = clazz.getSimpleName();
+    }
+
+    //
+    log.log(Level.INFO, "Saving script " + scriptName + " " + scriptText);
+
+    // Save the command
+    Session session = LifeCycle.getSession();
+    session.commands.put(scriptName, new Script(scriptName, scriptText, clazz));
   }
 }

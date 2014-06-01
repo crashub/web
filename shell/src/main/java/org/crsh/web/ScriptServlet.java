@@ -20,9 +20,6 @@ package org.crsh.web;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.control.CompilationUnit;
-import org.codehaus.groovy.control.Phases;
-import org.codehaus.groovy.control.SourceUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,15 +27,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebServlet(urlPatterns = "/script")
 public class ScriptServlet extends HttpServlet {
-
-  /** . */
-  private static final Logger log = Logger.getLogger(ScriptServlet.class.getSimpleName());
 
   /** . */
   static final Gson gson = new Gson();
@@ -50,8 +42,8 @@ public class ScriptServlet extends HttpServlet {
       super.doDelete(req, resp);
     } else {
       // Save the command
-      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-      lf.removeCommand(name);
+      Session session = LifeCycle.getSession();
+      session.removeScript(name);
       resp.setStatus(HttpServletResponse.SC_OK);
     }
   }
@@ -66,14 +58,10 @@ public class ScriptServlet extends HttpServlet {
       resp.setContentType("application/json");
       gson.toJson(payload, resp.getWriter());
     } else {
-
-      // Check syntax errors and determine the name of the class
-      CompilationUnit unit = new CompilationUnit();
-      SourceUnit su = unit.addSource("whatever", script);
-
-      //
+      Session session = LifeCycle.getSession();
       try {
-        unit.compile(Phases.CLASS_GENERATION);
+        // Perhaps we should check that :-)
+        session.setScript(req.getParameter("name"), script);
       }
       catch (CompilationFailedException e) {
         e.printStackTrace();
@@ -84,24 +72,6 @@ public class ScriptServlet extends HttpServlet {
         gson.toJson(payload, resp.getWriter());
         return;
       }
-
-      //
-      unit.getClasses();
-      String mainClass = su.getAST().getMainClassName();
-
-      //
-      String name = req.getParameter("name");
-      if (name == null || name.length() == 0) {
-        name = mainClass;
-      }
-
-      //
-      log.log(Level.INFO, req.getRemoteHost() + " saving script " + name + " " + script);
-
-      // Save the command
-      LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-      SimpleFS commands = lf.getCommands();
-      commands.setScript(name, script);
 
       // Say ok
       resp.setStatus(200);

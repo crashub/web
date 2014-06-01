@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /** @author <a href="mailto:julien.viet@exoplatform.com">Julien Viet</a> */
 @WebServlet(urlPatterns = "/scripts")
@@ -37,15 +38,10 @@ public class ScriptsServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LifeCycle lf = LifeCycle.getLifeCycle(getServletContext());
-    SimpleFS commands = lf.getCommands();
-    Iterable<String> names = commands.list();
+    Session session = LifeCycle.getSession();
     HashMap<String, String> map = new LinkedHashMap<String, String>();
-    for (String name : names) {
-      String script = commands.getScript(name);
-      if (name != null) {
-        map.put(name, script);
-      }
+    for (Map.Entry<String, Script> command : session.commands.entrySet()) {
+      map.put(command.getKey(), command.getValue().content);
     }
     resp.setStatus(HttpServletResponse.SC_OK);
     resp.setContentType("application/json");
