@@ -35,7 +35,7 @@ public class Script {
           return make(cmd);
         }
         catch (IntrospectionException e) {
-          throw new CommandException(name, ErrorKind.EVALUATION, "Invalid cli annotations", e);
+          throw new CommandException(ErrorKind.EVALUATION, "Invalid cli annotations for command " + name, e);
         }
       }
       else if (GroovyScriptCommand.class.isAssignableFrom(clazz)) {
@@ -44,11 +44,11 @@ public class Script {
           return make2(cmd);
         }
         catch (IntrospectionException e) {
-          throw new CommandException(name, ErrorKind.EVALUATION, "Invalid cli annotations", e);
+          throw new CommandException(ErrorKind.EVALUATION, "Invalid cli annotations for command " + name, e);
         }
       }
       else {
-        throw new CommandException(name, ErrorKind.INTERNAL, "Could not create command " + name + " instance");
+        throw new CommandException(ErrorKind.INTERNAL, "Could not create command " + name + " instance");
       }
     }
     return null;
