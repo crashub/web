@@ -1,51 +1,202 @@
 @import "bootstrap/bootstrap.less";
 @import "themes/cerulean/bootswatch.less";
-@import "themes/cerulean/variables.less";
+@import "themes/cerulean/variables";
 @import "font/font-awesome.less";
-
-@gridColumnWidth: @gridColumnWidth1200;
-@gridGutterWidth: @gridGutterWidth1200;
-@gridRowWidth: @gridRowWidth1200;
+@import "menu.less";
+@import "footer.less";
 
 body {
   padding-top: 64px;
 }
 
 div.console {
-  font-size:@baseFontSize;
+  font-size:@font-size-base;
   line-height: 1.3em;
-  background-color:@heroUnitBackground;
+  background-color: lighten(#000, 86%);
   .border-radius(6px);
 }
 div.console div.jquery-console-inner {
-  height:(@baseLineHeight * 30);
+  height:(@line-height-base * 30);
   margin:0.5em;
   word-wrap: break-word;
   overflow-x: hidden;
   overflow-y:auto;
 }
 div.console div.jquery-console-prompt-box {
-  color:@textColor;
+  color:@text-color;
   font-family:monospace;
 }
 div.console div.jquery-console-focus span.jquery-console-cursor {
-  background:@textColor;
-  color:@bodyBackground;
+  background:@text-color;
+  color:@body-bg;
   font-weight:bold;
 }
 div.console div.jquery-console-message-error {
-  color:@textColor;
+  color:@text-color;
   font-family:sans-serif;
   font-weight:bold;
   padding:0.1em;
 }
 div.console div.jquery-console-message {
   font-family:monospace;
-  /*padding:0.1em;*/
-}
-div.console div.jquery-console-message-success {
-  /*color:#187718;*/
 }
 div.console span.jquery-console-prompt-label {
   font-weight:bold;
+}
+
+//
+/*
+*******************
+*/
+
+.try-page {
+	padding: 40px 0;
+}
+
+.page-header {
+	border-bottom: none;
+}
+
+.big-title-with-arrow {
+	color: @gray;
+	background: url("@{image-path}icon/big-arrow-icon.png") no-repeat left center;
+	padding-left: 40px;
+}
+
+.btn-group {
+	margin: 0 0 15px;
+	.btn {
+		padding: 8px;
+	} 
+}
+
+.popover {
+	&.bottom {
+		margin-top: 58px;
+		> .arrow {
+			left: 25px;
+		}
+	}
+	input {
+		margin-bottom: 10px;
+	}
+	select {
+		width: 100%;
+	}
+}
+
+
+.nav-stacked { 
+	border: 1px solid #d7d7d7;
+	> li {
+		a {
+			background-color: #f1f1f1;
+			border-radius: 0;
+			border-bottom: 1px solid #dfdfdf;
+			color: @text-color;
+			&:hover,
+      		&:focus {
+      			background-color: #6e6e6e;	
+      			color: @white;
+      		}
+		}
+		> .arrow {
+			left: 15%;
+		    margin-left: -@popover-arrow-outer-width;
+		    border-bottom-width: 0;
+		    border-top-color: @popover-arrow-outer-fallback-color; // IE8 fallback
+		    border-top-color: @popover-arrow-outer-color;
+		    bottom: -@popover-arrow-outer-width;
+		    border-width: @popover-arrow-outer-width;
+		    &:after {
+		    	display: block;
+				border: 5px solid transparent;
+				content: "";
+		    	margin-left: 25px;
+		    	border-bottom-width: 0;
+		    	border-top-color: @popover-arrow-color;
+		    	top: 39px;
+				z-index: 100;
+				position: absolute;
+			
+		    }
+		}
+	}
+	
+	> li + li {
+		margin-top: 0;
+	}
+	
+	> li:first-child, > li:last-child {
+		a {
+			border-bottom: none;
+			&:hover,
+      		&:focus {
+      			background-color: #f1f1f1;
+      			color: inherit;
+      		}
+		}
+	}
+	> li:first-child {
+		a {
+			font-size: @font-size-h4;
+			color: @text-color;
+			padding: 7px 15px;
+			background-color: @white;
+			&:hover,
+      		&:focus {
+      			background-color: @white;
+      		}
+		}
+	}
+	> li:last-child {
+		a {
+			border-bottom: none;
+			&:hover,
+      		&:focus {
+      			background-color: #f1f1f1;
+      			color: inherit;
+      		}
+		}
+	}
+	
+	&.header {
+		background: @white;
+		font-size: 18px;
+	}
+}
+
+.nav-stacked > li .close {
+	opacity: 1;		
+}
+
+.ui-icon {
+	background-image: url("../images/icon-try-on.png");
+	height: 24px;
+	width: 24px;
+	display: inline-block;
+}
+
+.upload-shell .ui-icon {
+	background-position: 0 0;
+}
+
+.twitter-shell .ui-icon {
+	background-position: -24px 0;
+}
+
+.gplus-shell .ui-icon {
+	background-position: -48px 0;
+}
+
+.clear-shell .ui-icon {
+	background-position: -72px 0;
+}
+
+.ui-icon-plus {
+	background-position: -6px -30px;
+}
+
+.icon-close {
+	background-position: -40px -32px;
 }

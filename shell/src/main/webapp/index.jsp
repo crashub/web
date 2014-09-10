@@ -25,33 +25,12 @@
     String prefix = request.getContextPath();
   %>
 
-  <!--
-  <script src="js/jquery-1.7.1.min.js"></script>
-  <script src="js/jquery.mousewheel-min.js"></script>
-  <script src="js/jquery.terminal-0.7.12.js"></script>
-  <script src="js/crash.js"></script>
-  <script type="text/javascript" src="js/bootstrap-tab.js"></script>
-  <script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
-  <script type="text/javascript" src="js/bootstrap-popover.js"></script>
-  <script type="text/javascript" src="js/bootstrapx-clickover.js"></script>
-  <script type="text/javascript" src="js/bootstrap-alert.js"></script>
-  <script type="text/javascript" src="js/bootstrap-modal.js"></script>
-  <script type="text/javascript" src="js/codemirror.js"></script>
-  <script type="text/javascript" src="js/groovy.js"></script>
-  <script type="text/javascript" src="js/twitter.js"></script>
-  -->
   <script type="text/javascript" src="<%= prefix %>/js/crash-1.2.js"></script>
 
 
-  <!--
-    <link rel="stylesheet" href="css/codemirror.css">
-    <link rel="stylesheet/less" type="text/css" href="less/console-1.2.less"/>
-    <script type="text/javascript" src="js/less-1.6.0.min.js"></script>
-    <link rel="stylesheet" href="css/jquery.terminal.css"/>
-  -->
   <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/console-1.2.css"/>
   <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/crash-1.2.css"/>
-
+<!--
 
   <script type="text/javascript">
 
@@ -386,8 +365,9 @@
 
   </script>
 
-
+-->
   <!-- Google Analytics -->
+  <!--
   <script type="text/javascript">
 
     var _gaq = _gaq || [];
@@ -401,111 +381,148 @@
     })();
 
   </script>
+  -->
 </head>
-<body>
+	<body>
+		<%@ include file="menu.ftl" %>
+		<div class="container">
+			<div class="try-page">
+				<div class="page-header"><h1 class="big-title-with-arrow">Try On</h1></div>
+				<!--
+				<div class="row">
+					<div class="col-md-8">
+						<div id="tab-content" class="tab-content">
+							<div class="tab-pane active" id="tab0">
+								<div class="btn-group">
+									<a class="btn btn-default upload-shell disabled" href="#" title="Upload your commands"><i class="icon-cloud-upload"></i></a>
+									<a class="btn btn-default twitter-shell" href="#" title="Share on twitter"><i class="icon-twitter"></i></a>
+									<a class="btn btn-default gplus-shell" href="#" title="Share on Google+"><i class="icon-google-plus"></i></a>
+									<a style="display: none" class="btn btn-default github-shell" href="#" title="View gist" target="_blank"><i class="icon-github"></i></a>
+									<a class="btn btn-default clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
+								</div>
+								<div id="console"></div>
+								<form id="create-gists" action="gists" method="post"></form>
+							</div>
+						</div>
+						<div class="panel panel-default">
+							<div class="panel-heading">Console</div>
+							<div class="panel-body">
+								<div class="list-group">
+									<a href="#" class="list-group-item active">Cras justo odio <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></a>
+									<a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+									<a href="#" class="list-group-item">Morbi leo risus</a>
+									<a href="#" class="list-group-item">Porta ac consectetur ac</a>
+									<a href="#" class="list-group-item">Vestibulum at eros</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<ul id="nav-tabs" class="nav nav-tabs nav-stacked">
+							<li class="active"><a href="#tab0">Console</a></li>
+							<li style="text-align:center">
+								<a
+								id="add-command"
+								href="#"
+								data-placement="bottom"
+								data-html="true"
+								data-trigger="manual"
+								data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option></div>"
+								data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				-->
+				<div class="row">
+					<div class="col-md-9">
+						<div id="console" style="height: 600px;" class="terminal">
+							<div class="terminal-output"></div>
+							<div class="cmd" style="width: 100%; visibility: hidden;">
+								<span class="prompt"></span><span></span><span class="cursor">&nbsp;</span><span></span><textarea class="clipboard"></textarea>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="btn-group">
+							<a class="btn btn-default upload-shell disabled" href="#" title="Upload your commands"><i class="ui-icon ui-icon-cloud-upload"></i></a>
+							<a class="btn btn-default twitter-shell" href="#" title="Share on twitter"><i class="ui-icon ui-icon-twitter"></i></a>
+							<a class="btn btn-default gplus-shell" href="#" title="Share on Google+"><i class="ui-icon ui-icon-google-plus"></i></a>
+							<a style="display: none" class="btn btn-default github-shell" href="#" title="View gist" target="_blank"><i class="ui-icon ui-icon-github"></i></a>
+							<a class="btn btn-default clear-shell" href="#" title="Clear the shell"><i class="ui-icon ui-icon-trash"></i></a>
+						</div>
+						
+						<ul id="nav-tabs" class="nav nav-pills nav-stacked">
+							<li>
+								<a href="#tab0">Console</a>
+								<div class="arrow"></div>
+							</li>
+							<li class="active"><a href="#">sample1 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true" class="ui-icon icon-close"></span><span class="sr-only">Close</span></button></a></li>
+							<li>
+								<a href="#">sample2</a>
+							</li>
+							<li>
+								<a href="#"><span class="ui-icon ui-icon-plus"></span></a>
+								<div class="popover clickover fade bottom in" style="display: block;"><div class="arrow"></div><h3 class="popover-title">Add command</h3><div class="popover-content"><div><input type="text" id="command-name"></div><div><select id="command-template"><option>hello</option><option>date</option></select></div></div></div>
+							</li>
+						</ul>
+					</div>
+					
+				</div>
+			</div>
+		</div>
 
-<div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container">
-      <ul id="tabs" class="nav">
-        <li><a href="http://www.crashub.org" target="blank">Crashub</a></li>
-        <li><a href="http://www.crashub.org/beta/reference.html" target="blank">Documentation</a></li>
-      </ul>
-    </div>
-  </div>
-</div>
+		<!-- Used to determine font metric -->
+		<!--
+		<div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
+			<div class="jquery-console-message">A</div>
+		</div>
 
-<div class="container">
-  <div class="row">
-    <div class="span12">
-      <p style="text-align: center">Sponsored by <a href="http://www.exoplatform.com" target="blank">eXo Platform</a>,
-          follow our <a href="http://blog.exoplatform.com" target="blank">developer's blog</a>!</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span12">
-      <div class="tabbable tabs-right">
-        <ul id="nav-tabs" class="nav nav-tabs">
-          <li class="active"><a href="#tab0">Console</a></li>
-          <li style="text-align:center">
-            <a
-              id="add-command"
-              href="#"
-              data-placement="bottom"
-              data-html="true"
-              data-trigger="manual"
-              data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option></div>"
-              data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
-          </li>
-        </ul>
-        <div id="tab-content" class="tab-content">
-          <div class="tab-pane active" id="tab0">
-              <div class="btn-toolbar">
-              <div class="btn-group btn-group-vertical" style="float:right">
-                <a class="btn upload-shell disabled" href="#" title="Upload your commands"><i class="icon-cloud-upload"></i></a>
-                <a class="btn twitter-shell" href="#" title="Share on twitter"><i class="icon-twitter"></i></a>
-                <a class="btn gplus-shell" href="#" title="Share on Google+"><i class="icon-google-plus"></i></a>
-                <a style="display: none" class="btn github-shell" href="#" title="View gist" target="_blank"><i class="icon-github"></i></a>
-                <a class="btn clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
-              </div>
-            </div>
-            <div id="console"></div>
-            <form id="create-gists" action="gists" method="post"></form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+		<div id="compilation-error-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
+				<div class="alert alert-error">
+					<strong>Compilation error</strong>
+				</div>
+				<pre id="compilation-error-dialog-body"></pre>
+			</div>
+		</div>
 
-<!-- Used to determine font metric -->
-<div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
-  <div class="jquery-console-message">A</div>
-</div>
+		<div id="invalid-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
+				<div class="alert alert-error">
+					<strong>Invalid name</strong>
+				</div>
+			</div>
+		</div>
 
-<div id="compilation-error-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-body">
-    <div class="alert alert-error">
-      <strong>Compilation error</strong>
-    </div>
-    <pre id="compilation-error-dialog-body"></pre>
-  </div>
-</div>
-
-<div id="invalid-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-body">
-    <div class="alert alert-error">
-      <strong>Invalid name</strong>
-    </div>
-  </div>
-</div>
-
-<div id="duplicate-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-body">
-        <div class="alert alert-error">
-            <strong>Command already exist</strong>
-        </div>
-    </div>
-</div>
-
-<!-- The command templates -->
-<pre id="template-hello" style="display:none">
-// The simplest command
-return "hello world";
-</pre>
-<pre id="template-date" style="display:none">
-// Class based commands using annotations
-class {{name}} {
-  @Usage("show the current time")
-  @Command
-  Object main(@Usage("the time format") @Option(names=["f","format"]) String format) {
-    if (format == null)
-      format = "EEE MMM d HH:mm:ss z yyyy";
-    def date = new Date();
-    return date.format(format);
-  }
-}
-</pre>
-
-</body>
+		<div id="duplicate-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
+				<div class="alert alert-error">
+					<strong>Command already exist</strong>
+				</div>
+			</div>
+		</div>
+-->
+		<!-- The command templates -->
+		<!--
+		<pre id="template-hello" style="display:none">
+		// The simplest command
+		return "hello world";
+		</pre>
+		<pre id="template-date" style="display:none">
+		// Class based commands using annotations
+		class {{name}} {
+		  @Usage("show the current time")
+		  @Command
+		  Object main(@Usage("the time format") @Option(names=["f","format"]) String format) {
+			if (format == null)
+			  format = "EEE MMM d HH:mm:ss z yyyy";
+			def date = new Date();
+			return date.format(format);
+		  }
+		}
+		</pre>
+		-->
+		<%@ include file="footer.ftl" %>
+	</body>
 </html>

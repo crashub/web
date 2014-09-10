@@ -1,0 +1,88 @@
+
+/** Navigation bar **/
+.navbar.navbar-fixed-top {
+	background: @blue;
+	border-bottom: 3px solid @black;
+	min-height: 64px;
+	.github {
+		position: absolute;
+		left: 0;
+		top: 0;
+		z-index: 100;
+	}
+	.logo {
+		display: block;
+		padding: 10px 0;
+	}
+	
+	.navbar-right {
+		position: absolute;
+		right: 0;
+		top: 0;
+		z-index: 200;
+		> li {
+			background: transparent; 
+			border: 1px solid transparent;
+			margin: 15px 5px;
+			a {
+				color: @white;
+				padding-top: 5px;
+				padding-bottom: 5px;
+				font-weight: bold;
+				&:hover, &:focus {
+					background-color: transparent;
+				}
+			}
+		}
+		
+		> li:hover, li.active {
+			background: transparent;
+			border: 1px solid @light-blue;
+			border-radius: 5px;
+			> a, > a:hover, > a:focus {
+				background: transparent;
+				color: @white;
+			}
+		}
+		
+		> li:last-child {
+			margin: 0;
+			border: none;
+			&:hover, &:active { 
+				border: none;
+			}
+		}
+		
+		> li > ul > li {
+			display: inline-block;
+			list-style: none;
+			border-left: 1px solid @light-gray;
+			a {
+				padding: 18px;
+				display: block;
+				.uiIconCrash {
+					width: 24px;
+					height: 24px;
+					background: url("@{image-path}icon/menu-icon-white.png") no-repeat left top;
+					display: block;
+					&.uiIconGithub {
+						background-position: 0 0;
+					}
+					
+					&.uiIconTwitter {
+						background-position: -24px 0;
+					}
+					
+					&.uiIconExo {
+						background-position: -48px 0;
+					}
+				}
+				&:hover, &:focus, &:active {
+					.uiIconCrash {
+						background-image: url("@{image-path}icon/menu-icon-dark.png");
+					}
+				}			
+			}
+		}
+	}
+}
