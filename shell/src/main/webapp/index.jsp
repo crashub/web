@@ -30,40 +30,23 @@
 
   <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/console-1.2.css"/>
   <link rel="stylesheet" type="text/css" href="<%= prefix %>/css/crash-1.2.css"/>
-<!--
+
 
   <script type="text/javascript">
 
     $(document).ready(function() {
 
-      //
-/*
-      var demo =
-              "\n" +
-              "\n" +
-              "This CRaSH demo provides a few CRaSH features:\n" +
-
-              "Examples (must be created from command templates first):\n" +
-              "% dashboard                                                admin dashboard\n" +
-              "% thread top                                               show all threads\n" +
-              "% thread ls                                                list all threads\n" +
-              "% thread dump X                                            dump thread X\n" +
-              "% system propget java.version                              display a system property\n" +
-              "% system freemem                                           display amount of free memory\n" +
-
-              "\n" +
-              "Type 'help' to show the available commands\n";
-*/
-
       // When console tab is shown we give focus to the shell
       $('a[href="#tab0"]').on("shown", function() {
         $("#console").trigger("click");
       });
+
       // Clear the shell (except the last div that is the prompt box)
       $(".clear-shell").on("click", function(e) {
-        // e.preventDefault();
-        // $(".jquery-console-inner > div:not(:last)").remove();
+        e.preventDefault();
+        $(".terminal > div.terminal-output").html("");
       });
+
       $(".upload-shell").on("click", function(e) {
         e.preventDefault();
         if (!$(this).hasClass("disabled")) {
@@ -79,6 +62,7 @@
           document.getElementById('create-gists').submit();
         }
       });
+
       $(".twitter-shell").on("click", function(e) {
         e.preventDefault();
         if (!$(this).hasClass("disabled")) {
@@ -87,6 +71,7 @@
           twitter(url);
         }
       });
+
       $(".gplus-shell").on("click", function(e) {
         e.preventDefault();
         if (!$(this).hasClass("disabled")) {
@@ -135,12 +120,14 @@
       // Script functions
       var addScript = function(name, script) {
         var tabId = "tab" + tabSeq++;
-        var tab = $('<li><a href="#' + tabId + '">' + name + '</a></li>');
+        var tab = $('<li><a href="#' + tabId + '">'
+                    + name
+                    + '<button data-dismiss="alert" class="remove-command close" type="button">' +
+                      '<span class="ui-icon icon-close" aria-hidden="true"></span>'+
+                      '<span class="sr-only">Close</span>'+
+                      '</button></a></li>');
         var pane = $('<div id="' + tabId + '" class="tab-pane">' +
-          '<div class="btn-toolbar"><div class="btn-group btn-group-vertical" style="float:right">' +
-          '<a class="btn remove-command" href="#" title="Remove this command"><i class="icon-remove-circle"></i></a>' +
-          '</div></div>' +
-          '<form><textarea rows="16"" cols="80"></textarea>' +
+          '<form><textarea rows="16" cols="80"></textarea>' +
           '</form>' +
           '</div>');
         $("#tab-content").append(pane);
@@ -215,7 +202,7 @@
       });
 
       // Refresh editor when tab is shown
-      $('#nav-tabs').on('shown', 'a[href*="#tab"]', function (e) {
+      $('#nav-tabs').on('show.bs.tab', 'a[href*="#tab"]', function (e) {
         var id = $(e.target).attr("href").substring(1);
         var editor = editors.getEditor(id);
         if (editor != null) {
@@ -225,9 +212,10 @@
       });
 
       // Remove script
-      $('body').on("click", "a.remove-command", function(e) {
+      $('body').on("click", "button.remove-command", function(e) {
         e.preventDefault();
-        var pane = $(this).closest(".tab-pane");
+        var $a = $(this).closest("a");
+        var pane = $($a.attr('href'));
         var id = pane.attr("id");
         var editor = editors.removeEditor(id);
         current = null;
@@ -257,6 +245,9 @@
       });
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 13) {
+          // Hack for dismissing bootstrapx-clickover
+          $('#add-command').click();
+
           var name = $(this).val();
           var template = $("#command-template").val();
           var script = "public class " + name + " {\n  @Command\n  public void main() {\n    out.println('hello');\n  }\n}";
@@ -281,14 +272,9 @@
                 200: function() {
                   var tab = addScript(name, script);
                   var id = tab.find("a").tab("show").attr("href");
-                  // Hack for dismissing bootstrapx-clickover
-                  var event = jQuery.Event("keyup.clickery");
-                  event.which = 27;
-                  event.keyCode = 27;
                   $(".upload-shell").removeClass("disabled");
                   $(".twitter-shell").addClass("disabled");
                   $(".gplus-shell").addClass("disabled");
-                  $('#add-command').trigger(event);
                   crash.resume()
                 },
                 400: function(xhr, status, response) {
@@ -359,15 +345,14 @@
           var url = protocol + '://' + window.location.host + "<%= prefix %>" + '/crash';
 
           // Set top level crash on purpose
-          crash = new CRaSH($('#console'), 960, 600);
+          crash = new CRaSH($('#console'), 'auto', 500);
           crash.connect(url);
       });
 
   </script>
 
--->
+
   <!-- Google Analytics -->
-  <!--
   <script type="text/javascript">
 
     var _gaq = _gaq || [];
@@ -381,7 +366,7 @@
     })();
 
   </script>
-  -->
+
 </head>
 	<body>
 		<%@ include file="menu.ftl" %>
@@ -436,12 +421,17 @@
 				-->
 				<div class="row">
 					<div class="col-md-9">
-						<div id="console" style="height: 600px;" class="terminal">
-							<div class="terminal-output"></div>
-							<div class="cmd" style="width: 100%; visibility: hidden;">
-								<span class="prompt"></span><span></span><span class="cursor">&nbsp;</span><span></span><textarea class="clipboard"></textarea>
-							</div>
-						</div>
+                        <div id="tab-content" class="tab-content">
+                            <div class="tab-pane active" id="tab0">
+                                <div id="console" style="height: 600px;" class="terminal">
+                                    <div class="terminal-output"></div>
+                                    <div class="cmd" style="width: 100%; visibility: hidden;">
+                                        <span class="prompt"></span><span></span><span class="cursor">&nbsp;</span><span></span><textarea class="clipboard"></textarea>
+                                    </div>
+                                </div>
+                                <form id="create-gists" action="gists" method="post"></form>
+                            </div>
+                        </div>
 					</div>
 					<div class="col-md-3">
 						<div class="btn-group">
@@ -457,14 +447,16 @@
 								<a href="#tab0">Console</a>
 								<div class="arrow"></div>
 							</li>
-							<li class="active"><a href="#">sample1 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true" class="ui-icon icon-close"></span><span class="sr-only">Close</span></button></a></li>
-							<li>
-								<a href="#">sample2</a>
-							</li>
-							<li>
-								<a href="#"><span class="ui-icon ui-icon-plus"></span></a>
-								<div class="popover clickover fade bottom in" style="display: block;"><div class="arrow"></div><h3 class="popover-title">Add command</h3><div class="popover-content"><div><input type="text" id="command-name"></div><div><select id="command-template"><option>hello</option><option>date</option></select></div></div></div>
-							</li>
+                            <li style="text-align:center">
+                              <a
+                                      id="add-command"
+                                      href="#"
+                                      data-placement="bottom"
+                                      data-html="true"
+                                      data-trigger="manual"
+                                      data-content='<div class="form"><input type="text" id="command-name" class="form-control"></div><div><select id="command-template" class="form-control"><option>hello</option><option>date</option></select></div>'
+                                      data-original-title="Add command"><span class="ui-icon ui-icon-plus"></span></a>
+                            </li>
 						</ul>
 					</div>
 					
@@ -473,7 +465,6 @@
 		</div>
 
 		<!-- Used to determine font metric -->
-		<!--
 		<div id="metric" class="console" style="position: absolute;visibility: hidden;height: auto; width: auto">
 			<div class="jquery-console-message">A</div>
 		</div>
@@ -502,9 +493,8 @@
 				</div>
 			</div>
 		</div>
--->
+
 		<!-- The command templates -->
-		<!--
 		<pre id="template-hello" style="display:none">
 		// The simplest command
 		return "hello world";
@@ -522,7 +512,6 @@
 		  }
 		}
 		</pre>
-		-->
 		<%@ include file="footer.ftl" %>
 	</body>
 </html>
