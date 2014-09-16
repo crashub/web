@@ -373,52 +373,6 @@
 		<div class="container">
 			<div class="try-page">
 				<div class="page-header"><h1 class="big-title-with-arrow">Try On</h1></div>
-				<!--
-				<div class="row">
-					<div class="col-md-8">
-						<div id="tab-content" class="tab-content">
-							<div class="tab-pane active" id="tab0">
-								<div class="btn-group">
-									<a class="btn btn-default upload-shell disabled" href="#" title="Upload your commands"><i class="icon-cloud-upload"></i></a>
-									<a class="btn btn-default twitter-shell" href="#" title="Share on twitter"><i class="icon-twitter"></i></a>
-									<a class="btn btn-default gplus-shell" href="#" title="Share on Google+"><i class="icon-google-plus"></i></a>
-									<a style="display: none" class="btn btn-default github-shell" href="#" title="View gist" target="_blank"><i class="icon-github"></i></a>
-									<a class="btn btn-default clear-shell" href="#" title="Clear the shell"><i class="icon-trash"></i></a>
-								</div>
-								<div id="console"></div>
-								<form id="create-gists" action="gists" method="post"></form>
-							</div>
-						</div>
-						<div class="panel panel-default">
-							<div class="panel-heading">Console</div>
-							<div class="panel-body">
-								<div class="list-group">
-									<a href="#" class="list-group-item active">Cras justo odio <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button></a>
-									<a href="#" class="list-group-item">Dapibus ac facilisis in</a>
-									<a href="#" class="list-group-item">Morbi leo risus</a>
-									<a href="#" class="list-group-item">Porta ac consectetur ac</a>
-									<a href="#" class="list-group-item">Vestibulum at eros</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-4">
-						<ul id="nav-tabs" class="nav nav-tabs nav-stacked">
-							<li class="active"><a href="#tab0">Console</a></li>
-							<li style="text-align:center">
-								<a
-								id="add-command"
-								href="#"
-								data-placement="bottom"
-								data-html="true"
-								data-trigger="manual"
-								data-content="<div><input id='command-name' type='text'/></div><div><select id='command-template'><option>hello</option><option>date</option></div>"
-								data-original-title="Add command"><i class="icon-plus-sign-alt"></i></a>
-							</li>
-						</ul>
-					</div>
-				</div>
-				-->
 				<div class="row">
 					<div class="col-md-9">
                         <div id="tab-content" class="tab-content">
@@ -447,7 +401,7 @@
 								<a href="#tab0">Console</a>
 								<div class="arrow"></div>
 							</li>
-                            <li style="text-align:center">
+                            <li>
                               <a
                                       id="add-command"
                                       href="#"
@@ -459,7 +413,6 @@
                             </li>
 						</ul>
 					</div>
-					
 				</div>
 			</div>
 		</div>

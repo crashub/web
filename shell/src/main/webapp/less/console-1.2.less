@@ -72,7 +72,6 @@ div.console span.jquery-console-prompt-label {
 
 .popover {
 	&.bottom {
-		margin-top: 58px;
 		> .arrow {
 			left: 25px;
 		}
@@ -167,7 +166,16 @@ div.console span.jquery-console-prompt-label {
 }
 
 .nav-stacked > li .close {
-	opacity: 1;		
+	display: none;	
+}
+
+.nav-stacked > li:hover,
+.nav-stacked > li:active,
+.nav-stacked > li.active {
+	.close {
+		opacity: 1;	
+		display: block;
+	}	
 }
 
 .ui-icon {
