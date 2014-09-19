@@ -422,7 +422,7 @@
 			<div class="jquery-console-message">A</div>
 		</div>
 
-		<div id="compilation-error-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div id="compilation-error-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-body">
 				<div class="alert alert-error">
 					<strong>Compilation error</strong>
@@ -431,7 +431,7 @@
 			</div>
 		</div>
 
-		<div id="invalid-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div id="invalid-name-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-body">
 				<div class="alert alert-error">
 					<strong>Invalid name</strong>
@@ -439,7 +439,7 @@
 			</div>
 		</div>
 
-		<div id="duplicate-name-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div id="duplicate-name-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			<div class="modal-body">
 				<div class="alert alert-error">
 					<strong>Command already exist</strong>
