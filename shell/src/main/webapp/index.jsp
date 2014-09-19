@@ -423,25 +423,31 @@
 		</div>
 
 		<div id="compilation-error-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
 				<div class="alert alert-danger fade in">
-					<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<strong>Compilation error</strong>
 				</div>
 				<pre id="compilation-error-dialog-body"></pre>
+			</div>
 		</div>
 
 		<div id="invalid-name-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
 				<div class="alert alert-danger fade in">
-					<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<strong>Invalid name</strong>
 				</div>
+			</div>
 		</div>
 
 		<div id="duplicate-name-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-body">
 				<div class="alert alert-danger fade in">
-					<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 					<strong>Command already exist</strong>
 				</div>
+			</div>
 		</div>
 
 		<!-- The command templates -->
