@@ -6,42 +6,44 @@
 @import "footer.less";
 
 body {
-  padding-top: 64px;
+	padding-top: 64px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
+	font-weight: 400; 
 }
 
 div.console {
-  font-size:@font-size-base;
-  line-height: 1.3em;
-  background-color: lighten(#000, 86%);
-  .border-radius(6px);
+	font-size:@font-size-base;
+	line-height: 1.3em;
+	background-color: lighten(#000, 86%);
+	.border-radius(6px);
 }
 div.console div.jquery-console-inner {
-  height:(@line-height-base * 30);
-  margin:0.5em;
-  word-wrap: break-word;
-  overflow-x: hidden;
-  overflow-y:auto;
+	height:(@line-height-base * 30);
+	margin:0.5em;
+	word-wrap: break-word;
+	overflow-x: hidden;
+	overflow-y:auto;
 }
 div.console div.jquery-console-prompt-box {
-  color:@text-color;
-  font-family:monospace;
+	color:@text-color;
+	font-family:monospace;
 }
 div.console div.jquery-console-focus span.jquery-console-cursor {
-  background:@text-color;
-  color:@body-bg;
-  font-weight:bold;
+	background:@text-color;
+	color:@body-bg;
+	font-weight:bold;
 }
 div.console div.jquery-console-message-error {
-  color:@text-color;
-  font-family:sans-serif;
-  font-weight:bold;
-  padding:0.1em;
+	color:@text-color;
+	font-family:sans-serif;
+	font-weight:bold;
+	padding:0.1em;
 }
 div.console div.jquery-console-message {
-  font-family:monospace;
+	font-family:monospace;
 }
 div.console span.jquery-console-prompt-label {
-  font-weight:bold;
+	font-weight:bold;
 }
 
 //
@@ -50,13 +52,18 @@ div.console span.jquery-console-prompt-label {
 */
 
 .try-page {
-	padding: 40px 0;
+	padding: 0 0 40px;
+	color: @gray;
 }
-
 .page-header {
 	border-bottom: none;
+	padding-bottom: 0;
+	margin: 125px 0 55px;
 }
-
+.row .tab-content {
+	margin-right: -15px;
+	margin-bottom: 15px;
+}
 .big-title-with-arrow {
 	color: @gray;
 	background: url("@{image-path}icon/big-arrow-icon.png") no-repeat left center;
@@ -67,14 +74,19 @@ div.console span.jquery-console-prompt-label {
 	margin: 0 0 15px;
 	.btn {
 		padding: 8px;
+		border-radius: 0;
 	} 
 }
 
 .popover {
+	z-index: 1000;
 	&.bottom {
 		left: 0 !important;
 		> .arrow {
 			left: 25px;
+		}
+		.popover-title {
+			color: @blue;
 		}
 	}
 	input {
@@ -112,7 +124,7 @@ div.console span.jquery-console-prompt-label {
 		    	display: block;
 				border: 5px solid transparent;
 				content: "";
-		    	margin-left: 25px;
+		    	margin-left: 33px;
 		    	border-bottom-width: 0;
 		    	border-top-color: @popover-arrow-color;
 		    	top: 39px;

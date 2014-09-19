@@ -1,9 +1,7 @@
-
 /** Navigation bar **/
-.navbar.navbar-fixed-top {
+.navbar {
 	background: @blue;
 	border-bottom: 3px solid @black;
-	min-height: 64px;
 	.github {
 		position: absolute;
 		left: 0;
@@ -17,7 +15,7 @@
 	
 	.navbar-right {
 		position: absolute;
-		right: 0;
+		right: 10px;
 		top: 0;
 		z-index: 200;
 		> li {
@@ -26,9 +24,8 @@
 			margin: 15px 5px;
 			a {
 				color: @white;
-				padding-top: 5px;
-				padding-bottom: 5px;
-				font-weight: bold;
+				padding: 7px 20px;
+				font-weight: 500;
 				&:hover, &:focus {
 					background-color: transparent;
 				}
@@ -46,7 +43,7 @@
 		}
 		
 		> li:last-child {
-			margin: 0;
+			margin: 0 7px 0 0;
 			border: none;
 			&:hover, &:active { 
 				border: none;
@@ -63,7 +60,7 @@
 				.uiIconCrash {
 					width: 24px;
 					height: 24px;
-					background: url("@{image-path}icon/menu-icon-white.png") no-repeat left top;
+					background: url("@{image-path}icon/menu-icon-dark.png") no-repeat left top;
 					display: block;
 					&.uiIconGithub {
 						background-position: 0 0;
@@ -77,11 +74,6 @@
 						background-position: -48px 0;
 					}
 				}
-				&:hover, &:focus, &:active {
-					.uiIconCrash {
-						background-image: url("@{image-path}icon/menu-icon-dark.png");
-					}
-				}			
 			}
 		}
 	}
