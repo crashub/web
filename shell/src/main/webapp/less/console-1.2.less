@@ -127,24 +127,27 @@ div.console span.jquery-console-prompt-label {
       		}
 		}
 		> .arrow {
-			left: 15%;
-		    margin-left: -@popover-arrow-outer-width;
-		    border-bottom-width: 0;
-		    border-top-color: @popover-arrow-outer-fallback-color; // IE8 fallback
-		    border-top-color: @popover-arrow-outer-color;
-		    bottom: -@popover-arrow-outer-width;
-		    border-width: @popover-arrow-outer-width;
-		    &:after {
-		    	display: block;
-				border: 5px solid transparent;
-				content: "";
-		    	margin-left: 33px;
-		    	border-bottom-width: 0;
-		    	border-top-color: @popover-arrow-color;
-		    	top: 39px;
-				z-index: 100;
-				position: absolute;
+			margin-left: 20px;
+			border-color: transparent;
+		    border-style: solid;
+		    display: block;
+		    height: 0;
+		    position: absolute;
+			content: "";
+			border-top-color: #dfdfdf;
+			z-index: 100;
+			border-width: 6px;
 			
+		    &:after {
+		    	border-color: transparent;
+			    border-style: solid;
+			    position: absolute;
+    			content: "";
+    			border-top-color: #fff;
+				z-index: 100;
+				border-width: 7px;
+    			bottom: -5px;
+				left: -7px;
 		    }
 		}
 	}
@@ -155,7 +158,6 @@ div.console span.jquery-console-prompt-label {
 	
 	> li:first-child, > li:last-child {
 		a {
-			border-bottom: none;
 			&:hover,
       		&:focus {
       			background-color: #f1f1f1;
@@ -222,6 +224,10 @@ div.console span.jquery-console-prompt-label {
 
 .gplus-shell .ui-icon {
     background-position: -24px 0;
+}
+
+.github-shell .ui-icon {
+	background-position: -96px 0;
 }
 
 .clear-shell .ui-icon {
