@@ -391,7 +391,7 @@
                                         <span class="prompt"></span><span></span><span class="cursor">&nbsp;</span><span></span><textarea class="clipboard"></textarea>
                                     </div>
                                 </div>
-                                <form id="create-gists" action="gists" method="post"></form>
+                                <form id="create-gists" action="<%= prefix %>/gists" method="post"></form>
                             </div>
                         </div>
 					</div>

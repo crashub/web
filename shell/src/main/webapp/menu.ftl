@@ -15,9 +15,9 @@
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav navbar-right">
-		            <li class="active"><a href="<%= prefix %>">Home</a></li>
+		            <li><a href="<%= prefix %>">Home</a></li>
 		            <li><a href="http://www.crashub.org/managers.html">Install</a></li>
-		            <li><a href="/">Demo</a></li>
+		            <li class="active"><a href="/">Demo</a></li>
 		            <li><a href="http://www.crashub.org/contributors.html">Contributors</a></li>
 		            <li><a href="http://www.crashub.org/links.html">Links</a></li>
 		            <li class="menu-icon-item">
