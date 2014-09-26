@@ -1,6 +1,6 @@
 <div class="navbar navbar-default navbar-fixed-top">
 	<a href="https://github.com/crashub">
-		<img class="github img-responsive"class="github" alt="Fork me on GitHub" src="images/github.png">
+		<img class="github img-responsive"class="github" alt="Fork me on GitHub" src="<%= prefix %>/images/github.png">
 	</a>
 	<div class="container">
 		<div class="row">
@@ -11,11 +11,11 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 		        </button>
-				<a class="logo" href="http://www.crashub.org/"><img class="img-responsive"alt="logo" src="images/logo.png"></a>
+				<a class="logo" href="http://www.crashub.org/"><img class="img-responsive" alt="logo" src="<%= prefix %>/images/logo.png"></a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav navbar-right">
-		            <li class="active"><a href="/">Home</a></li>
+		            <li class="active"><a href="<%= prefix %>">Home</a></li>
 		            <li><a href="http://www.crashub.org/managers.html">Install</a></li>
 		            <li><a href="/">Demo</a></li>
 		            <li><a href="http://www.crashub.org/contributors.html">Contributors</a></li>

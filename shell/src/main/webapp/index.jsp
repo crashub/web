@@ -209,6 +209,11 @@
           editor.widget.refresh();
         }
         current = e.target;
+        if(editor) {
+            $('.clear-shell').addClass('disabled');
+        } else {
+            $('.clear-shell').removeClass('disabled');
+        }
       });
 
       // Remove script
@@ -245,9 +250,6 @@
       });
       $("body").on("keyup", "#command-name", function(e) {
         if (e.keyCode == 13) {
-          // Hack for dismissing bootstrapx-clickover
-          $('#add-command').click();
-
           var name = $(this).val();
           var template = $("#command-template").val();
           var script = "public class " + name + " {\n  @Command\n  public void main() {\n    out.println('hello');\n  }\n}";
@@ -255,6 +257,10 @@
             script = $(this).text();
             script = script.replace("{{name}}", name); // Replace {{name}} by name
           });
+
+          // Hack for dismissing bootstrapx-clickover
+          $('#add-command').click();
+
           if (name == null || name.length == 0) {
             $('#invalid-name-dialog').modal("show")
           } else if (editors.getEditorByName(name)) {
@@ -290,9 +296,11 @@
       });
 
       // Are we showing a gist ?
-      var match = window.location.pathname.match(/\/gists\/([0-9]+)/);
+      var match = window.location.pathname.match(/\/gists\/([0-9a-z]+)/);
       if (match) {
         $('.github-shell').attr("href", "https://gist.github.com/" + match[1]).css("display", "block");
+        $('.twitter-shell').removeClass('disabled');
+        $('.gplus-shell').removeClass('disabled');
       }
 
       // Download scripts from session
@@ -390,8 +398,8 @@
 					<div class="col-md-3">
 						<div class="btn-group">
 							<a class="btn btn-default upload-shell disabled" href="#" title="Upload your commands"><i class="ui-icon ui-icon-cloud-upload"></i></a>
-							<a class="btn btn-default twitter-shell" href="#" title="Share on twitter"><i class="ui-icon ui-icon-twitter"></i></a>
-							<a class="btn btn-default gplus-shell" href="#" title="Share on Google+"><i class="ui-icon ui-icon-google-plus"></i></a>
+							<a class="btn btn-default twitter-shell disabled" href="#" title="Share on twitter"><i class="ui-icon ui-icon-twitter"></i></a>
+							<a class="btn btn-default gplus-shell disabled" href="#" title="Share on Google+"><i class="ui-icon ui-icon-google-plus"></i></a>
 							<a style="display: none" class="btn btn-default github-shell" href="#" title="View gist" target="_blank"><i class="ui-icon ui-icon-github"></i></a>
 							<a class="btn btn-default clear-shell" href="#" title="Clear the shell"><i class="ui-icon ui-icon-trash"></i></a>
 						</div>
@@ -408,7 +416,7 @@
                                       data-placement="bottom"
                                       data-html="true"
                                       data-trigger="manual"
-                                      data-content='<div class="form"><input type="text" id="command-name" class="form-control"></div><div><select id="command-template" class="form-control"><option>hello</option><option>date</option></select></div>'
+                                      data-content='<div class="form"><input type="text" id="command-name" class="form-control"></div><div><select id="command-template" class="form-control"><option value="hello">hello</option><option value="date">date</option></select></div>'
                                       data-original-title="Add command"><span class="ui-icon ui-icon-plus"></span></a>
                             </li>
 						</ul>
