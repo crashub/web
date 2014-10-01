@@ -24,7 +24,7 @@
 		            	<ul>
 		            		<li><a href="https://github.com/crashub/crash"><i class="uiIconCrash uiIconGithub"></i></a></li>
 		            		<li><a href="https://twitter.com/crashub"><i class="uiIconCrash uiIconTwitter"></i></a></li>
-		            		<li><a href="http://community.exoplatform.com/"><i class="uiIconCrash uiIconExo"></i></a></li>
+		            		<li><a href="http://community.exoplatform.com/portal/g/:spaces:crash/crash/forum"><i class="uiIconCrash uiIconExo"></i></a></li>
 						</ul>
 					</li>
 				</ul>
