@@ -1,6 +1,6 @@
 		<div class="footer">
 			<div class="container">
-				<p class="pull-left">Sponsored by <a href="#" class="text-blue">eXo Platform</a></p>
+				<p class="pull-left">Sponsored by <a href="http://www.exoplatform.com" class="text-blue">eXo Platform</a></p>
 				<ul class="footer-links pull-right clearfix">
 					<li>Follow us: </li>
 					<li><a href="https://www.facebook.com/eXoPlatform"><i class="uiIconSoc uiIconFacebook"></i></a></li>
